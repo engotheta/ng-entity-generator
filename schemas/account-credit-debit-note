@@ -1,0 +1,128 @@
+type AccountCreditDebitNote {
+active: Boolean
+amountApplied: BigDecimal
+approvalStatus: ApprovalStatus
+balance: BigDecimal
+client: Client
+contentEditable: Boolean
+createdAt: LocalDateTime
+createdBy: User
+createdById: Long
+currentApprovalStage: ApprovalProcessStage
+currentApprovalStageAssignedDate: LocalDateTime
+currentAssignedGroup: Role
+currentAssignedUserAccount: User
+deletedAt: LocalDateTime
+deletedBy: Long
+deletedId: Long
+department: Division
+description: String
+finalApprovedBy: User
+finalApprovedByUsername: String
+finalApprovedDate: LocalDateTime
+financialYear: FinancialYear
+id: Long
+invoice: AccountInvoice
+isApprovalCompleted: Boolean
+isDeleted: Boolean
+items: [AccountCreditDebitNoteItem]
+migrated: Boolean
+noteDate: LocalDate
+noteNumber: String
+noteType: CreditDebitNoteType
+post: Division
+postedAt: LocalDateTime
+postedBy: Long
+processName: String
+reason: String
+receivableAccount: ChartOfAccount
+referenceNumber: String
+reversalReason: String
+reversedAt: LocalDateTime
+reversedBy: Long
+status: CreditDebitNoteStatus
+systemNumber: String
+totalAmount: BigDecimal
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type AccountCreditDebitNoteItem {
+account: ChartOfAccount
+active: Boolean
+amount: BigDecimal
+createdAt: LocalDateTime
+createdBy: User
+createdById: Long
+deletedAt: LocalDateTime
+deletedBy: Long
+deletedId: Long
+description: String
+id: Long
+isDeleted: Boolean
+migrated: Boolean
+note: AccountCreditDebitNote
+quantity: BigDecimal
+revenueBudgetItem: RevenueBudgetItem
+uid: String
+unitPrice: BigDecimal
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type CreditDebitNoteDtoInput {
+description: String
+invoiceUid: String!
+items: [CreditDebitNoteItemDtoInput]!
+noteDate: LocalDate!
+noteType: CreditDebitNoteType!
+reason: String
+referenceNumber: String
+uid: String
+}
+
+type CreditDebitNoteItemDtoInput {
+accountUid: String!
+description: String!
+quantity: BigDecimal
+revenueBudgetItemUid: String
+uid: String
+unitPrice: BigDecimal
+}
+
+enum CreditDebitNoteStatus {
+APPLIED
+CANCELLED
+DRAFT
+POSTED
+REVERSED
+}
+
+enum CreditDebitNoteType {
+CREDIT
+DEBIT
+}
+ 
+Mutation.saveCreditDebitNote(
+input: CreditDebitNoteDtoInput!
+): Response_AccountCreditDebitNote
+
+Mutation.postCreditDebitNote(
+uid: String!
+): Response_AccountCreditDebitNote
+
+Mutation.reverseCreditDebitNote(
+reason: String
+uid: String!
+reversalDate: LocalDate
+): Response_AccountCreditDebitNote
+
+Query.allCreditDebitNotesPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_AccountCreditDebitNote
+Query.allCreditDebitNotes: [AccountCreditDebitNote]
+Query.findCreditDebitNote(
+uid: String!
+): Response_AccountCreditDebitNote

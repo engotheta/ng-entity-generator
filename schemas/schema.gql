@@ -1,0 +1,133 @@
+type AccountImprest {
+active: Boolean
+advanceAccount: ChartOfAccount
+amount: BigDecimal
+approvalStatus: ApprovalStatus
+balance: BigDecimal
+bankAccount: BankAccount
+contentEditable: Boolean
+createdAt: LocalDateTime
+createdBy: User
+createdById: Long
+currentApprovalStage: ApprovalProcessStage
+currentApprovalStageAssignedDate: LocalDateTime
+currentAssignedGroup: Role
+currentAssignedUserAccount: User
+deletedAt: LocalDateTime
+deletedBy: Long
+deletedId: Long
+department: Division
+description: String
+dueDate: LocalDate
+finalApprovedBy: User
+finalApprovedByUsername: String
+finalApprovedDate: LocalDateTime
+financialYear: FinancialYear
+holderClient: Client
+holderEmployee: Employee
+id: Long
+isApprovalCompleted: Boolean
+isDeleted: Boolean
+items: [AccountImprestLineItem]
+migrated: Boolean
+post: Division
+processName: String
+referenceNumber: String
+requestDate: LocalDate
+retiredAmount: BigDecimal
+retirements: [AccountImprestRetirement]
+status: ImprestStatus
+systemNumber: String
+title: String
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type AccountImprestLineItem {
+account: ChartOfAccount
+active: Boolean
+amount: BigDecimal
+createdAt: LocalDateTime
+createdBy: User
+createdById: Long
+deletedAt: LocalDateTime
+deletedBy: Long
+deletedId: Long
+description: String
+id: Long
+imprest: AccountImprest
+isDeleted: Boolean
+migrated: Boolean
+quantity: BigDecimal
+uid: String
+unitCost: BigDecimal
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+
+enum ImprestStatus {
+AWAITING_RETIREMENT
+DRAFT
+POSTED
+RETIRED
+REVERSED
+}
+
+type AccountImprestDtoInput {
+advanceAccountUid: String!
+amount: BigDecimal!
+bankAccountUid: String!
+description: String
+dueDate: LocalDate
+financialYearUid: String!
+holderClientUid: String
+holderEmployeeUid: String
+items: [ImprestLineItemDtoInput]!
+referenceNumber: String!
+requestDate: LocalDate!
+title: String!
+uid: String
+}
+
+
+type ImprestLineItemDtoInput {
+chartOfAccountUid: String!
+description: String!
+quantity: BigDecimal!
+uid: String
+unitCost: BigDecimal!
+}
+
+type ImprestOutstandingDto {
+amount: BigDecimal
+balance: BigDecimal
+daysOverdue: Long!
+dueDate: LocalDate
+holder: String
+imprestUid: String
+referenceNumber: String
+requestDate: LocalDate
+retiredAmount: BigDecimal
+title: String
+}
+
+Mutation.postImprest(
+uid: String!
+): Response_AccountImprest
+Mutation.saveImprest(
+input: ImprestDtoInput!
+): Response_AccountImprest
+
+Query.findImprest(
+uid: String!
+): Response_AccountImprest
+Query.imprestOutstanding(
+asOf: LocalDate
+): [ImprestOutstandingDto]
+Query.allImprestsPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_AccountImprest
+Query.allImprests: [AccountImprest]

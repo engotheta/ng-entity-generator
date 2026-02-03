@@ -1,0 +1,16 @@
+<div class="flex flex-col h-full">
+  <page-header [actionButtons]="actionButtons" [title]="title"></page-header>
+
+  <app-data-table-hybrid
+    theme="simple"
+    class="block col px-0"
+    [name]="title"
+    [query]="query"
+    [actionButtons]="tableButtons"
+    [tableOptions]="tableOptions"
+    [searchKeys]="searchKeys"
+    [mapFunction]="mapFunction"
+    [columnsKeys]="columnsKeys"
+    [reloadActions]="reloadActions"
+  ></app-data-table-hybrid>
+</div>

@@ -1,0 +1,159 @@
+type Payable {
+active: Boolean
+amountPaid: BigDecimal
+approvalStatus: ApprovalStatus
+balance: BigDecimal
+billDate: LocalDate
+billNumber: String
+contentEditable: Boolean
+createdAt: LocalDateTime
+createdBy: User
+createdById: Long
+currentApprovalStage: ApprovalProcessStage
+currentApprovalStageAssignedDate: LocalDateTime
+currentAssignedGroup: Role
+currentAssignedUserAccount: User
+deletedAt: LocalDateTime
+deletedBy: Long
+deletedId: Long
+department: Division
+description: String
+dueDate: LocalDate
+finalApprovedBy: User
+finalApprovedByUsername: String
+finalApprovedDate: LocalDateTime
+financialYear: FinancialYear
+id: Long
+isApprovalCompleted: Boolean
+isDeleted: Boolean
+items: [PayableLineItem]
+migrated: Boolean
+payableAccount: ChartOfAccount
+payments: [PayablePayment]
+post: Division
+processName: String
+reversalReason: String
+reversed: Boolean
+reversedAt: LocalDateTime
+reversedBy: Long
+status: PayableStatus
+systemNumber: String
+totalAmount: BigDecimal
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+vendor: Client
+}
+
+type PayableDtoInput {
+billDate: LocalDate!
+billNumber: String!
+description: String
+dueDate: LocalDate!
+financialYearUid: String!
+items: [PayableItemDtoInput]!
+payableAccountUid: String!
+uid: String
+vendorUid: String!
+}
+
+enum PayableStatus {
+CANCELLED
+DRAFT
+PAID
+PARTIALLY_PAID
+POSTED
+REVERSED
+}
+
+type PayablePayment {
+active: Boolean
+amount: BigDecimal
+bankAccount: BankAccount
+createdAt: LocalDateTime
+createdBy: User
+createdById: Long
+deletedAt: LocalDateTime
+deletedBy: Long
+deletedId: Long
+id: Long
+isDeleted: Boolean
+memo: String
+migrated: Boolean
+payable: Payable
+paymentDate: LocalDate
+reference: String
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+enum LoanPayableEnum {
+EMPLOYEE
+THIRD_PARTY
+}
+
+type PayableItemDtoInput {
+accountUid: String!
+description: String!
+quantity: BigDecimal!
+uid: String
+unitCost: BigDecimal!
+}
+
+type PayablePaymentDtoInput {
+amount: BigDecimal!
+bankAccountUid: String!
+memo: String
+payableUid: String!
+paymentDate: LocalDate!
+reference: String
+}
+
+type PayableLineItem {
+account: ChartOfAccount
+active: Boolean
+amount: BigDecimal
+createdAt: LocalDateTime
+createdBy: User
+createdById: Long
+deletedAt: LocalDateTime
+deletedBy: Long
+deletedId: Long
+description: String
+id: Long
+isDeleted: Boolean
+migrated: Boolean
+payable: Payable
+quantity: BigDecimal
+uid: String
+unitCost: BigDecimal
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+Mutation.recordPayablePayment(
+input: PayablePaymentDtoInput!
+): Response_Payable
+Mutation.reversePayable(
+reason: String
+uid: String!
+reversalDate: LocalDate
+): Response_Payable
+Mutation.savePayable(
+input: PayableDtoInput!
+): Response_Payable
+Mutation.postPayable(
+uid: String!
+): Response_Payable
+Query.findPayable(
+uid: String!
+): Response_Payable
+Query.allPayablesPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_Payable
+Query.payableAging(
+asOf: LocalDate
+): [AgingRow]
+Query.allPayables: [Payable]
