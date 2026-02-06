@@ -1,7 +1,7 @@
-import { baseGqlFields } from '@shared';
-import gql from 'graphql-tag';
-import { responseGqlFields } from '@shared';
-import { pageGqlFields } from '@shared';
+import { baseGqlFields } from '@common/utilities/data.gql';
+import { gql } from '@apollo/client/core';
+import { responseGqlFields } from '@common/utilities/data.gql';
+import { pageGqlFields } from '@common/utilities/data.gql';
 
 export const accountImprestGqlFields = `
   advanceAccount{

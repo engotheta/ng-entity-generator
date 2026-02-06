@@ -1,103 +1,80 @@
-import { Component, OnInit } from "@angular/core";
-import { ANIMATION, QueryParameter, COMMON_FIELD_STRINGS, HIGHLIGHT  } from "@shared";
-import { ActionListener  } from "@shared";
-import { BaseComponent } from "@shared/view/base-component";
-import { cloneDeep } from "@apollo/client/utilities";
-import { ViewParameter } from "@shared/components/view-component/view-interface";
-import { ContentParameter } from "@shared/components/view-component/view-interface";
-import { getAccountImprestUpsertButton } from "./account-imprest.form";
-import { AccountImprestActions } from "@store/entities/accounts/account-imprest/account-imprest.actions";
-import { AccountImprest } from "@store/entities/accounts/account-imprest/account-imprest.model";
-import { mapAccountImprest } from "@store/entities/accounts/account-imprest/account-imprest.selectors";
+import { CommonModule } from "@angular/common";
+import { Component , OnInit } from "@angular/core";
+import { ContentParameter } from "@common/components/contents-view/view.interface";
+import { ContentsViewComponent } from "@common/components/contents-view/contents-view.component";
+import { PageHeaderComponent } from "@common/page-header.component";
+import { BaseComponent } from "@common/components/base-componet/base-component";
+import { ActionButton } from "@common/components/action-buttons/action-buttons.inteface";
+import { accountImprestUpsertBtn, accountImprest$ } from "./account-imprest.form";
+import { AccountImprest } from "./account-imprest.interface";
+import { FIND_IMPREST } from "./account-imprest.graphql";
 
 @Component({
-  selector: "app-account-imprest",
-   template: `<view-component [viewParameter]="viewParameter"></view-component>`
+  selector: 'app-account-imprest.',
+  imports: [CommonModule, PageHeaderComponent, ContentsViewComponent ],
+  template: `
+    <!--  -->
+    <div class="flex-1 flex flex-col gap-2">
+      <app-page-header
+        [title]="title"
+        [subtitle]="subtitle"
+        [actionButtons]="actionButtons"
+        [data]="accountImprest"
+      />
+      <contents-view class="block grow" [contents]="contents" />
+    </div>
+   `
 })
 export class AccountImprestComponent extends BaseComponent implements OnInit {
-  title = "Account Imprest";
-  animation = ANIMATION;
-  viewParameter: ViewParameter;
+  override title = 'Account Imprest';
+  override subtitle = 'Account Imprest Management';
 
-  accountImprest: AccountImprest;
-  reloadActions = [ AccountImprestActions.upsertAccountImprest ];
+  accountImprest: AccountImprest | undefined;
+  override contents: ContentParameter[] = [];
+  override actionButtons: ActionButton[] = [accountImprestUpsertBtn(this)];
+
+  fetchParameter: FetchParameter = {
+    loadingOn: 'no-content',
+    query: FIND_IMPREST,
+    variables: { uid:this.route.snapshot?.paramMap?.get('accountImprestUid')},
+    successFn:(res) => {this.title = res?.data?.title},
+  };
 
   async ngOnInit(): Promise<void> {
-    await this.loadData();
-    this.setContentParameters();
-    this.onNavigateToSelf(() => this.ngOnInit());
+    await this.setContents();
+    this.subs.add(accountImprest$.subscribe(() => this.setContents()));
   }
 
-  async loadData() {
-    let query = undefined;
-    let qp: QueryParameter = { mapFunction: mapAccountImprest };
-    let uid = this.route.snapshot?.paramMap?.get("uid");
-    this.accountImprest = cloneDeep(await this.fs.getData(qp, query, uid));
-  }
+  async setContents() {
+    this.accountImprest = await this.fs.fetch(this.fetchParameter);
 
-  setContentParameters() {
-    let data = {accountImprestUid:this.accountImprest.uid};
-    let subtitle = this.accountImprest.title;
-
-    let contentsParameters: ContentParameter[] = [
+    this.contents = [
       {
-        icon: "item",
-        type: "details",
-        slug: "account-imprest",
-        name: subtitle,
-        headerButtons: [getAccountImprestUpsertButton(this, false, "edit")],
+        type: 'details',
         entity: this.accountImprest,
-
-        fieldsStrings:[
-          `title, finalApprovedByUsername, processName, description valueClass(${HIGHLIGHT})`,
-          ...COMMON_FIELD_STRINGS,
-        ],
-
+        showUndefined: true,
+        icon: 'notes',
+        fetchParameter: this.fetchParameter,
         children: [
           {
             type: "table",
             slug: "account-imprest-line-item",
-            name: "Account Imprest Line Item",
-            icon: "item",
-            columnsKeys: ['title', 'finalApprovedByUsername', 'processName', 'description', 'advanceAccount', 'amount'],
-            searchStatesValues: [{ key: "accountImprest.uid", value: this.accountImprest.uid }],
-            mapFunction: mapAccountImprestLineItem,
-            actionButtons: getAccountImprestLineItemButtons(this, data),
-            headerButtons: [getAccountImprestLineItemUpsertButton(this, false, "add", data)], 
-            query: ALL_ACCOUNT_IMPREST_LINE_ITEM_PAGEABLE, //TODO: put query
-            reloadActions: [AccountImprestLineItemActions.upsertAccountImprestLineItem, AccountImprestLineItemActions.deleteAccountImprestLineItem],
+            label: "Account Imprest Line Item",
+            icon: "circle",
+            keyColumns: ['title', 'finalApprovedByUsername', 'processName', 'description', 'advanceAccount', 'amount'],
+            gridData: this.accountImprest.items,
           },
           {
             type: "table",
             slug: "account-imprest-retirement",
-            name: "Account Imprest Retirement",
-            icon: "item",
-            columnsKeys: ['title', 'finalApprovedByUsername', 'processName', 'description', 'advanceAccount', 'amount'],
-            searchStatesValues: [{ key: "accountImprest.uid", value: this.accountImprest.uid }],
-            mapFunction: mapAccountImprestRetirement,
-            actionButtons: getAccountImprestRetirementButtons(this, data),
-            headerButtons: [getAccountImprestRetirementUpsertButton(this, false, "add", data)], 
-            query: ALL_ACCOUNT_IMPREST_RETIREMENT_PAGEABLE, //TODO: put query
-            reloadActions: [AccountImprestRetirementActions.upsertAccountImprestRetirement, AccountImprestRetirementActions.deleteAccountImprestRetirement],
+            label: "Account Imprest Retirement",
+            icon: "circle",
+            keyColumns: ['title', 'finalApprovedByUsername', 'processName', 'description', 'advanceAccount', 'amount'],
+            gridData: this.accountImprest.retirements,
           },
         ],
       },
     ];
-
-    //set view
-    this.viewParameter = {
-      animation: this.animation,
-      title: this.title,
-      subtitle: subtitle,
-      contentsParameters,
-    };
   }
 
-  listenToActions() {
-    const listeners: ActionListener[] = [
-      { actions: [...this.reloadActions], callback: () => this.loadData()},
-    ];
-
-    this.addActionListeners(listeners);
-  }
 }

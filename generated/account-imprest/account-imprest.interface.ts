@@ -1,6 +1,6 @@
-import { BaseEntity } from '../../base-entity/base-entity.model';
-import { Role } from '@store/features/settings/roles/role.interface'
-import { User } from '@store/features/portal/profile/profile.interface'
+import { BaseEntity } from "@common/utilities/data.interfaces";;
+import { Role } from '@features/settings/roles/role.interface'
+import { User } from '@features/portal/profile/profile.interface'
 
 export interface AccountImprest extends BaseEntity {
   advanceAccount?: ChartOfAccount;

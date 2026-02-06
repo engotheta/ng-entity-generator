@@ -7,10 +7,6 @@ id: UUID
 Mutation.changeTaskCategoryStatus(
 id: UUID
 ): Response_TaskCategory
-Query.getAllTaskCategories: [TaskCategoryResponse]
-Query.searchTaskCategories(
-filter: TaskCategoryFilterInput
-): [TaskCategoryResponse]
 Query.findTaskCategoryById(
 id: UUID
 ): Response_TaskCategory

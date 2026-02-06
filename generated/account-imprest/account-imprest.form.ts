@@ -6,10 +6,10 @@ import { VALIDATOR_REQUIRED } from '@common/components/generic-form/form-constan
 import { FormComponent } from '@common/components/generic-form/form.component';
 import { FormParameters } from '@common/components/generic-form/form.interface';
 import { MORE_BTN } from '@common/table/data-grid-constants';
-import { ActionButton } from '@common/table/resusable-table-action-button-action-interface';
+import { ActionButton } from '@common/components/action-buttons/action-buttons.inteface';';
 import { BaseComponent } from '@common/components/base-componet/base-component';
 import { Subject } from 'rxjs';
-import { SAVE_IMPREST, undefined } from './account-imprest.gql';
+import { SAVE_IMPREST, undefined } from './account-imprest.graphql';
 import { AccountImprest } from './account-imprest.interface';
 
 export const accountImprest$ = new Subject<AccountImprest | any>();
@@ -140,7 +140,7 @@ export const getAccountImprestForm = (comp: BaseComponent, data?: any): FormPara
    onSubmit: async (data: any) => {
      await comp.fs.fetch({
       notify: true,
-      variables: { accountImprestDto: data },
+      variables: { input:data},
       successFn: (res) => accountImprest$.next(res?.data),
       mutation: SAVE_IMPREST,
    });
@@ -176,14 +176,14 @@ export function accountImprestUpsertBtn(comp: BaseComponent) {
 
  export function accountImprestDeleteBtn(comp: BaseComponent) {
   return <ActionButton>{
-    ...getDeleteBtnProps('Account Imprest', 'name'),
+    ...getDeleteBtnProps('Account Imprest', 'title'),
     permissions: [],
 
     click: async (data: AccountImprest) => {
       await comp.fs.fetch({
         notify: true,
         loadingOn: 'content',
-        variables: { accountImprestUid: data.uid },
+        variables: { uid: 'data.uid'},
         finalFn: (res) => accountImprest$.next(res?.data),
         mutation: undefined,
       });

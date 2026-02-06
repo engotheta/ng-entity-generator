@@ -4,7 +4,7 @@ import { GridParameter, GridKeyColumn } from '@common/components/data-grid/data-
 import { BaseComponent } from '@common/components/base-componet/base-component';
 import { DataGridComponent } from '@common/components/data-grid/data-grid.component';
 import { PageHeaderComponent } from '@common/page-header.component';
-import { ALL_IMPRESTS_PAGEABLE } from './account-imprest.gql';
+import { ALL_IMPRESTS_PAGEABLE } from './account-imprest.graphql';
 import { accountImprestUpsertBtn } from './account-imprest.form';
 import { accountImprestTableBtns, accountImprest$ } from './account-imprest.form';
 

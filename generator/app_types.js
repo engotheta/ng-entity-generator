@@ -86,7 +86,7 @@ function findFiles(dir, extension) {
 function parseModelFile(filePath, storePath) {
   const content = fs.readFileSync(filePath, "utf-8");
   const relativePath =
-    "@store/" + path.relative(storePath, filePath).replace(/\\/g, "/");
+    "@" + path.relative(storePath, filePath).replace(/\\/g, "/");
   const types = [];
 
   // Extract interfaces

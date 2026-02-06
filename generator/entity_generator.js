@@ -1,6 +1,6 @@
 /**
- * NgRx File Generator for Angular/TypeScript
- * Generates NgRx store files from GraphQL schema definitions
+ * Entity Files Generator for Angular/TypeScript
+ * Generates Entity's Comps, interface, gql file files from GraphQL schema definitions
  */
 
 const fs = require("fs");
@@ -36,16 +36,7 @@ class Operation {
   }
 }
 
-const upsertsDeletes = [
-  `save`,
-  `update`,
-  `restore`,
-  `archive`,
-  `delete`,
-  `deactivate`,
-];
-
-class NgRxGenerator {
+class EntityGenerator {
   constructor() {
     this.baseFields = [
       "active",
@@ -61,6 +52,8 @@ class NgRxGenerator {
       "updatedAt",
       "updatedBy",
     ];
+
+    this.dtoSuffixes = ["DtoInput", "Dto", "Input", "RequestInput"];
   }
 
   parseGraphqlSchema(schema) {
@@ -171,20 +164,9 @@ class NgRxGenerator {
     return params;
   }
 
-  _getSingleQueryName(entityName, operations) {
-    let queryPart = [`find${entityName}`, `get${entityName}By`];
-    //prettier-ignore
-    let fOperations = operations?.filter((o) => queryPart.some(x => o.name.includes(x)));
-    //prettier-ignore
-    let fOperation = fOperations.find((o) => o.name.includes("find")) ?? fOperations?.[0];
-    //prettier-ignore
-    return !!fOperation ? this._toScreamingSnake(fOperation?.name) : undefined;
-  }
-
   _getDtoTypeByEntityName(types, entityName, force = false) {
-    let suffixes = ["DtoInput", "Dto"];
     //prettier-ignore
-    let type = types.find((t) =>  suffixes.some((s) => t.name === `${entityName}${s}`) );
+    let type = types.find((t) =>  this.dtoSuffixes.some((s) => t.name === `${entityName}${s}`) );
     //prettier-ignore
     if (!type && force) return this._getDtoType(types, `${entityName}${suffixes[0]}`, force);
     else return type
@@ -203,10 +185,10 @@ class NgRxGenerator {
 
     //prettier-ignore
     if (force && !dto  ) {
-      let suffix = ['DtoInput','Dto'].find(s => typeName.endsWith(s)) ?? '';
+      let suffix =  this.dtoSuffixes.find(s => typeName.endsWith(s)) ?? '';
       let typeName_ = typeName.substring(0, typeName.length -  suffix.length );
       let subTypes = this._generateSubNames(typeName_).map(s => `${s}${suffix}`);
-      console.log('sdfdsfdsfdsfdsf ',typeName_, subTypes)
+      // console.log('sdfdsfdsfdsfdsf ',typeName_, subTypes)
       let i = 0;
       //prettier-ignore
       for (  i = 0; i < subTypes.length && !dto; i++) dto = getType(subTypes[i]);
@@ -216,7 +198,7 @@ class NgRxGenerator {
     return dto;
   }
 
-  _getListQueryNameFromAll(entityName, force = false) {
+  _getListOperationFromAll(entityName, force = false) {
     let getOperation = (typeName) => {
       let queryPart = [
         `${typeName}Pageable`,
@@ -285,8 +267,44 @@ class NgRxGenerator {
     );
   }
 
-  _getListQueryName(entityName, operations) {
+  _getFindOperation(entityName, operations) {
+    let entityTitle = this._toTitleCase(entityName);
+
+    let queryPart = [
+      `find${entityName}`,
+      `get${entityName}By`,
+      `${entityName}By`,
+      `get${entityName}`,
+    ];
+
+    //prettier-ignore
+    let fOperations = operations?.filter((o) => {
+     return queryPart.some(x => o.name.toLowerCase().includes(x.toLowerCase()))
+    });
+
+    let fOperation = fOperations?.[0];
+    let titles = entityTitle.split(" ");
+
+    if (!fOperation && titles.length >= 2) {
+      for (const title of titles) {
+        fOperation = this._getFindOperation(title, operations);
+        if (!!fOperation) return fOperation;
+      }
+    }
+
+    return fOperation;
+  }
+
+  _getFindOperationName(entityName, operations) {
+    //prettier-ignore
+    let fOperation = this._getFindOperation(entityName, operations);
+    //prettier-ignore
+    return !!fOperation ? this._toScreamingSnake(fOperation?.name) : undefined;
+  }
+
+  _getListOperation(entityName, operations) {
     let entityPlural = this._toPlural(entityName);
+    let entityTitle = this._toTitleCase(entityName);
 
     let queryPart = [
       `${entityName}Pageable`,
@@ -300,7 +318,6 @@ class NgRxGenerator {
 
     //prettier-ignore
     let fOperations = operations?.filter((o) => {
-
       let nameMatch = queryPart.some(x => o.name.toLowerCase().includes(x.toLowerCase()))
 
       let returnMatch = 
@@ -312,63 +329,111 @@ class NgRxGenerator {
     });
 
     //prettier-ignore
-    let fOperation =   fOperations?.[0];
-
-    //prettier-ignore
-    return !!fOperation ? this._toScreamingSnake(fOperation?.name) : undefined;
-  }
-
-  _getDeleteQueryName(entityName, operations) {
-    let entityPlural = this._toPlural(entityName);
-
-    const verbs = ["delete", "remove"];
-    const entities = [entityName, entityPlural];
-
-    //prettier-ignore
-    const queryPart = verbs.flatMap((verb) => entities.map((entity) => `${verb}${entity}`));
-
-    //prettier-ignore
-    let fOperations = operations?.filter((o) => {
-      let nameMatch = queryPart.some(x => o.name.toLowerCase().includes(x.toLowerCase()))
-      return nameMatch  
-    });
-
-    //prettier-ignore
-    let fOperation =   fOperations?.[0];
-
-    //prettier-ignore
-    return !!fOperation ? this._toScreamingSnake(fOperation?.name) : undefined;
-  }
-
-  _getCreateQueryName(entityName, operations) {
-    let entityPlural = this._toPlural(entityName);
-    let entityTitle = this._toTitleCase(entityName);
-
-    const verbs = ["create", "add", "save"];
-    const entities = [entityName, entityPlural];
-    //prettier-ignore
-    const queryPart = verbs.flatMap((verb) => entities.map((entity) => `${verb}${entity}`));
-
-    //prettier-ignore
-    let fOperations = operations?.filter((o) => {
-      let nameMatch = queryPart.some(x => o.name.toLowerCase().includes(x.toLowerCase()))
-      return nameMatch  
-    });
-
-    //prettier-ignore
-    let fOperation =   fOperations?.[0];
-
+    let fOperation = fOperations?.[0];
     let titles = entityTitle.split(" ");
 
     if (!fOperation && titles.length >= 2) {
       for (const title of titles) {
-        let name = this._getCreateQueryName(title, operations);
-        // end here
-        if (!!name) return name;
+        //prettier-ignore
+        fOperation = this._getListOperation(title, operations)
+        if (!!fOperation) return fOperation;
       }
     }
 
-    return !!fOperation ? this._toScreamingSnake(fOperation?.name) : undefined;
+    //prettier-ignore
+    return  fOperation ;
+  }
+
+  _getListOperationName(entityName, operations) {
+    let fOperation = this._getListOperation(entityName, operations);
+    //prettier-ignore
+    return  fOperation ? this._toScreamingSnake(fOperation?.name) : undefined;
+  }
+
+  _getOperationByVerbs(entityName, operations, verbs) {
+    let entityPlural = this._toPlural(entityName);
+    let entityTitle = this._toTitleCase(entityName);
+
+    const entities = [entityName, entityPlural];
+    //prettier-ignore
+    const queryPart = verbs.flatMap((verb) => entities.map((entity) => `${verb}${entity}`));
+
+    //prettier-ignore
+    let fOperations = operations?.filter((o) => {
+      let nameMatch = queryPart.some(x => o.name.toLowerCase().includes(x.toLowerCase()))
+      return nameMatch  
+    });
+
+    let fOperation = fOperations?.[0];
+    let titles = entityTitle.split(" ");
+
+    if (!fOperation && titles.length >= 2) {
+      for (const title of titles) {
+        //prettier-ignore
+        fOperation = this._getOperationByVerbs(title, operations, verbs)
+        if (!!fOperation) return fOperation;
+      }
+    }
+
+    return fOperation;
+  }
+
+  _getDeleteOperation(entityName, operations) {
+    const verbs = ["delete", "remove"];
+    return this._getOperationByVerbs(entityName, operations, verbs);
+  }
+
+  _getDeleteOperationName(entityName, operations) {
+    let fOperation = this._getDeleteOperation(entityName, operations);
+    //prettier-ignore
+    return !!fOperation?.name ? this._toScreamingSnake(fOperation?.name) : undefined;
+  }
+
+  _getCreateOperation(entityName, operations) {
+    const verbs = [
+      "create",
+      "add",
+      "save",
+      "createUpdate",
+      "createOrUpdate",
+      "update",
+    ];
+
+    return this._getOperationByVerbs(entityName, operations, verbs);
+  }
+
+  _getCreateOperationName(entityName, operations) {
+    let fOperation = this._getCreateOperation(entityName, operations);
+    //prettier-ignore
+    return !!fOperation?.name ? this._toScreamingSnake(fOperation?.name) : undefined;
+  }
+
+  _removeTabsFromEachLine(str, tabCount = 1, skipedLines = []) {
+    const tabs = " ".repeat(tabCount);
+    if (!Array.isArray(skipedLines)) skipedLines = [skipedLines];
+
+    return str
+      .split("\n")
+      .map((line, index) => {
+        if (skipedLines.includes(index)) return line;
+
+        // remove only the specified number of leading tabs
+        if (line.startsWith(tabs)) {
+          return line.slice(tabs.length);
+        }
+
+        // fallback → remove as many leading tabs as exist up to tabCount
+        let removed = 0;
+        let i = 0;
+
+        while (removed < tabCount && line[i] === " ") {
+          i++;
+          removed++;
+        }
+
+        return line.slice(i);
+      })
+      .join("\n");
   }
 
   _addTabsToEachLine(str, tabCount = 1, skipedLines = []) {
@@ -402,6 +467,7 @@ class NgRxGenerator {
     const typeMapping = {
       String: "string",
       Int: "number",
+      UUID: "string",
       Long: "number",
       Float: "number",
       Boolean: "boolean",
@@ -409,6 +475,7 @@ class NgRxGenerator {
       BigDecimal: "number",
       LocalDate: "string",
     };
+
     return typeMapping[graphqlType] || graphqlType;
   }
 
@@ -634,6 +701,7 @@ class NgRxGenerator {
       "LocalDateTime",
       "BigDecimal",
       "Long",
+      "UUID",
     ]);
 
     return gqlScalars.has(type);
@@ -654,7 +722,10 @@ class NgRxGenerator {
     // prettier-ignore
     const otherTypes = types.filter((t)=>  !t.name.includes('Dto') && !t.isEnum);
 
-    let imports = `import { BaseEntity } from '../../base-entity/base-entity.model';\n`;
+    let imports = "";
+
+    // ignoring base entity since no standards
+    // let imports =  `import { BaseEntity } from "@common/utilities/data.interfaces";\n`;
 
     let content = "";
 
@@ -674,10 +745,12 @@ class NgRxGenerator {
 
     //
     otherTypes.forEach((type) => {
-      content += `export interface ${type.name} extends BaseEntity {\n`;
-      for (const field of type.fields) {
-        if (!this.baseFields.includes(field.name)) addField(field);
-      }
+      // content += `export interface ${type.name} extends BaseEntity {\n`;
+      content += `export interface ${type.name} {\n`;
+
+      //put all no reserving basefields // if (!this.baseFields.includes(field.name))
+      for (const field of type.fields) addField(field);
+
       content += "}\n\n";
     });
 
@@ -709,52 +782,77 @@ class NgRxGenerator {
   generateGraphqlFile(entityName, operations, types) {
     const camelName = this._toCamelCase(entityName);
 
-    // Get custom fields (excluding base fields)
-    const mainType = types.find((t) => t.name === entityName);
+    const allReturnTypes = [
+      ...new Set(
+        operations.map(
+          (o) =>
+            `${o.returnType
+              .replace("Response_", "")
+              .replace("[", "")
+              .replace("]", "")}=${o.returnType}`,
+        ),
+      ),
+    ];
 
-    const fields = mainType
-      ? mainType.fields.filter((f) => !this.baseFields.includes(f.name))
-      : [];
+    // sort longer to shorter
+    allReturnTypes.sort((a, b) => b.length - a.length);
 
-    let imports = `import { baseGqlFields } from '@shared';\n`;
-    imports += "import gql from 'graphql-tag';\n";
+    //prettier-ignore
+    console.log("--------------------Return Typers-------------------", allReturnTypes );
+
+    let imports = `import { baseGqlFields } from '@common/utilities/data.gql';\n`;
+    imports += `import { gql } from '@apollo/client/core';\n`;
+    imports += `import { responseGqlFields } from '@common/utilities/data.gql';\n`;
 
     let content = ``;
 
-    // Generate field list
-    content += `export const ${camelName}GqlFields = \`\n`;
+    // Generate all Types seen in return type field list
 
-    for (const field of fields) {
-      if (this._isGqlType(field.type) || field.isEnum) {
-        content += `  ${field.name}\n`;
-      } else {
-        let fieldType =
-          types.find((t) => t.name === field.type) ??
-          ALL_TYPES.find((t) => t.name === field.type);
+    for (const returnType of allReturnTypes) {
+      const entityName_ = returnType.split("=")[0];
+      const type_ = types.find((t) => t.name === entityName_);
+      const camelName_ = this._toCamelCase(entityName_);
+      //prettier-ignore
+      // .filter((f) => !this.baseFields.includes(f.name)) // put the whole fields
+      const fields = type_ ? type_.fields : [];
 
-        let primitives = ["string", "boolean", "number"];
+      content += `export const ${camelName_}GqlFields = \`\n`;
 
-        let keys =
-          fieldType?.fields
-            .filter((f) => primitives.includes(this._graphqlToTsType(f.type)))
-            .map((f) => f.name)
-            .filter((k) => !!this._isBusinessKey(k)) ?? [];
+      for (const field of fields) {
+        //prettier-ignore
+        if (this._isGqlType(field.type) || field.isEnum)  content += `  ${field.name}\n`;
+        else {
+          //prettier-ignore
+          let fieldType = types.find((t) => t.name === field.type) ??  ALL_TYPES.find((t) => t.name === field.type);
+          let primitives = ["string", "boolean", "number",'UUID'];
 
-        keys = this._sortByReference(keys, this._getNameKeys(fieldType));
-        // .filter((k) => !!this._isNameKey(k)) ?? [];
+          let keys =
+            fieldType?.fields
+              .filter((f) => primitives.includes(this._graphqlToTsType(f.type)))
+              .map((f) => f.name)
+              .filter((k) => !!this._isBusinessKey(k)) ?? [];
 
-        // console.log(keys);
+          keys = this._sortByReference(keys, this._getNameKeys(fieldType));
+          // .filter((k) => !!this._isNameKey(k)) ?? [];
 
-        content += `  ${field.name}{\n`;
-        let innerKeys = [...keys.slice(0, 6), "uid"]; //TODO: get innerFields by type in the whole context
-
-        innerKeys.forEach((key) => (content += `    ${key}\n`));
-        content += `  }\n`;
+          // console.log(keys);
+          let commonKeys = []; // ['uid']; // dont put uid for now
+          let innerKeys = [...keys.slice(0, 6),...commonKeys]; //TODO: get innerFields by type in the whole context
+        
+          if(innerKeys.length){
+            content += `  ${field.name}{\n`;
+            innerKeys.forEach((key) => (content += `    ${key}\n`));
+            content += `  }\n`;
+          }
+    
+        }
       }
+
+      // content += "  ${baseGqlFields}\n"; // avaoid put base
+      content += "`;\n\n";
     }
 
-    content += "  ${baseGqlFields}\n";
-    content += "`;\n\n";
+    //
 
     // Generate mutations
     let type = " ";
@@ -792,26 +890,31 @@ class NgRxGenerator {
       }
 
       content += " {\n";
+
+      //set return type
       //prettier-ignore
-      if (op.returnType.includes("Page")) content += `      \${pageGqlFields(${camelName}GqlFields)}\n`;
+      const entityName_ = allReturnTypes.find(a => op.returnType === a.split('=')[1] )?.split('=')?.[0];
+      const camelName_ = this._toCamelCase(entityName_) ?? camelName;
+
       //prettier-ignore
-      else if (op.returnType.includes("Boolean"))  content += `      \${booleanResponseGqlFields}\n`;
+      if (op.returnType.includes("Page")) content += `      \${pageGqlFields(${camelName_}GqlFields)}\n`;
       //prettier-ignore
-      else if (op.returnType.includes("String")) content += `      \${responseStringGqlFields}\n`;
+      else if (op.returnType.includes("Boolean"))  content += `      \${plainResponseGqlFields}\n`;
       //prettier-ignore
-      else if (op.returnType.startsWith("["))  content += `      \${${camelName}GqlFields}\n`;
-      else content += `      \${responseGqlFields(${camelName}GqlFields)}\n`;
+      else if (op.returnType.includes("String")) content += `      \${plainResponseGqlFields}\n`;
+      //prettier-ignore
+      else if (op.returnType.startsWith("["))  content += `      \${${camelName_}GqlFields}\n`;
+      else content += `      \${responseGqlFields(${camelName_}GqlFields)}\n`;
 
       let ctypes = [
-        "booleanResponseGqlFields",
+        "plainResponseGqlFields",
         "pageGqlFields",
         "responseGqlFields",
-        "responseStringGqlFields",
       ];
 
       ctypes.forEach((type) => {
         if (content.includes(type) && !imports.includes(type)) {
-          imports += `import { ${type} } from '@shared';\n`;
+          imports += `import { ${type} } from '@common/utilities/data.gql';\n`;
         }
       });
 
@@ -823,7 +926,7 @@ class NgRxGenerator {
     return imports + "\n" + content;
   }
 
-  generateEntityListComp(entityName, operations, types, entityGroup) {
+  generateEntityListComp(entityName, operations, types) {
     const kebabName = this._toKebab(entityName);
     const kebabPlural = this._toPlural(kebabName);
     const titleName = this._toTitleCase(entityName);
@@ -831,8 +934,7 @@ class NgRxGenerator {
     const entityPlural = this._toPlural(entityName);
     const camelName = this._toCamelCase(entityName);
 
-    const entityGroup_ = !!entityGroup ? `${entityGroup}/` : ``;
-    const listQueryName = this._getListQueryName(entityName, operations);
+    const listQueryName = this._getListOperationName(entityName, operations);
     const mainType = types.find((t) => t.name === entityName);
 
     let businessKeys = this._getBusinessKeys(mainType);
@@ -840,12 +942,14 @@ class NgRxGenerator {
 
     let imports = "";
     imports += `import { Component, OnInit } from '@angular/core';\n`;
-    imports += `import { ActionButton } from '@common/components/action-buttons/action-buttons.inteface';\n`;
-    imports += `import { GridParameter, GridKeyColumn } from '@common/components/data-grid/data-grid.interfaces';\n`;
+    imports += `import { PageHeaderComponent } from '@common/page-header.component';\n`;
     imports += `import { BaseComponent } from '@common/components/base-componet/base-component';\n`;
     imports += `import { DataGridComponent } from '@common/components/data-grid/data-grid.component';\n`;
-    imports += `import { PageHeaderComponent } from '@common/page-header.component';\n`;
-    imports += `import { ${listQueryName} } from './${kebabName}.gql';\n`;
+    imports += `import { ActionButton } from '@common/components/action-buttons/action-buttons.inteface';\n`;
+    imports += `import { GridParameter, GridKeyColumn } from '@common/components/data-grid/data-grid.interfaces';\n`;
+    imports += `\n`;
+
+    imports += `import { ${listQueryName} } from './${kebabName}.graphql';\n`;
     imports += `import { ${camelName}UpsertBtn } from './${kebabName}.form';\n`;
     imports += `import { ${camelName}TableBtns, ${camelName}$ } from './${kebabName}.form';\n`;
 
@@ -860,228 +964,124 @@ class NgRxGenerator {
     content += `    </div>\n`;
     content += "  `,\n";
     content += `})\n`;
-    content += `export class ${entityPlural}Component extends BaseComponent implements OnInit {\n`;
+    content += `export class ${entityPlural}Component extends BaseComponent {\n`;
     content += `  override title: string = '${titlePlural} Management';\n`;
     content += `  override subtitle: string = '${titlePlural} List';\n`;
     content += `  override actionButtons: ActionButton[] = [${camelName}UpsertBtn(this)];\n`;
-    content += "\n";
-
-    content += `  gridParameter: GridParameter | undefined;\n`;
     content += "\n";
 
     //prettier-ignore
     content += `  keyColumns: GridKeyColumn[] = [${businessKeys.slice(0,6).map(k => "'"+k+"'").join(', ')}];\n`;
     content += "\n";
 
-    content += `  ngOnInit(): void {\n`;
-    content += `    this.setGridParameter();\n`;
-    content += `  }\n`;
+    content += `  gridParameter: GridParameter = {\n`;
+    content += `     title: '${titlePlural}',\n`;
+    content += `     icon: 'info_circle',\n`;
+    content += `     keyColumns: this.keyColumns,\n`;
+    content += `     actionButtons: ${camelName}TableBtns(this),\n`;
+    content += `     reloadActions$: [${camelName}$],\n`;
+    content += `     fetchParameter: { query: ${listQueryName} },\n`;
+    content += `   };\n`;
+
     content += "\n";
 
-    content += `  setGridParameter() {\n`;
-    content += `    this.gridParameter = {\n`;
-    content += `      title: '${titlePlural}',\n`;
-    content += `      icon: 'info_circle',\n`;
-    content += `      keyColumns: this.keyColumns,\n`;
-    content += `      actionButtons: ${camelName}TableBtns(this),\n`;
-    content += `      reloadActions$: [${camelName}$],\n`;
-    content += `      fetchParameter: { query: ${listQueryName} },\n`;
-    content += `    };\n`;
-    content += `  }\n`;
     content += `}\n`;
     content += "\n";
 
     return imports + `\n` + content;
   }
 
-  generateFormFile(entityName, operations, types, entityGroup = undefined) {
+  generateFormFile(entityName, operations, types) {
     const kebabName = this._toKebab(entityName);
     const kebabPlural = this._toPlural(kebabName);
     const camelName = this._toCamelCase(entityName);
     const titleName = this._toTitleCase(entityName);
-    const screamingSnake = this._toScreamingSnake(entityName);
 
-    const entityGroup_ = !!entityGroup ? `${entityGroup}/` : ``;
     const inputType = this._getDtoTypeByEntityName(types, entityName, true);
 
-    const deleteQueryName = this._getDeleteQueryName(entityName, operations);
-    const createQueryName = this._getCreateQueryName(entityName, operations);
+    const createOperation = this._getCreateOperation(entityName, operations);
+    const deleteOperation = this._getDeleteOperation(entityName, operations);
+    //prettier-ignore
+    const createOperationName = this._getCreateOperationName(entityName, operations);
+
+    //prettier-ignore
+    const deleteOperationName = this._getDeleteOperationName( entityName, operations);
 
     let imports = "";
     let content = "";
 
+    imports += `import { Subject } from 'rxjs';\n`;
+    imports += `import { MORE_BTN } from '@common/table/data-grid-constants';\n`;
+    imports += `import { FormComponent } from '@common/components/generic-form/form.component';\n`;
+    imports += `import { FormParameters } from '@common/components/generic-form/form.interface';\n`;
+    imports += `import { BaseComponent } from '@common/components/base-componet/base-component';\n`;
     imports += `import { getDeleteBtnProps } from '@common/components/contents-view/view.helpers';\n`;
     imports += `import { getUpsertBtnProps } from '@common/components/contents-view/view.helpers';\n`;
     imports += `import { navigateRelativeTo } from '@common/components/contents-view/view.helpers';\n`;
-    imports += `import { FieldConfig, FieldType } from '@common/components/generic-form/field.interface';\n`;
     imports += `import { VALIDATOR_REQUIRED } from '@common/components/generic-form/form-constants';\n`;
-    imports += `import { FormComponent } from '@common/components/generic-form/form.component';\n`;
-    imports += `import { FormParameters } from '@common/components/generic-form/form.interface';\n`;
-    imports += `import { MORE_BTN } from '@common/table/data-grid-constants';\n`;
-    imports += `import { ActionButton } from '@common/table/resusable-table-action-button-action-interface';\n`;
-    imports += `import { BaseComponent } from '@common/components/base-componet/base-component';\n`;
-    imports += `import { Subject } from 'rxjs';\n`;
-    imports += `import { ${createQueryName}, ${deleteQueryName} } from './${kebabName}.gql';\n`;
+    imports += `import { FieldConfig, FieldType } from '@common/components/generic-form/field.interface';\n`;
+    imports += `import { ActionButton } from '@common/components/action-buttons/action-buttons.inteface';\n`;
+    imports += `\n`;
+    imports += `import { ${createOperationName}, ${deleteOperationName} } from './${kebabName}.graphql';\n`;
     imports += `import { ${entityName} } from './${kebabName}.interface';\n`;
 
     //////////////
-
-    let getFieldsContent = (fields) => {
-      let fieldContent = "";
-
-      fields?.forEach((field) => {
-        let inputType = this._graphqlToFormType(field);
-        let fieldContentExtra = "";
-        let innerfieldContent = "";
-
-        //prettier-ignore
-        let isObjOrObjArray = !this._isGqlType(field.type) && !field.isEnum;
-
-        if (isObjOrObjArray) {
-          let typeName = field.type;
-          let dtoType = this._getDtoType(types, typeName, true);
-          let innerFields = dtoType?.fields ?? [];
-
-          //prettier-ignore
-          inputType = field.isArray ? 'FieldType.formGroupArray':'FieldType.formGroup';
-          //prettier-ignore
-          let contents_ = this._addTabsToEachLine(getFieldsContent(innerFields), 2, [0])
-
-          innerfieldContent += `    fields:[\n`;
-          innerfieldContent += `    ${contents_}`;
-          innerfieldContent += `],\n`;
-        }
-
-        let textareas = ["description", "summary", "remark"];
-        if (textareas.includes(field.name)) inputType = "FieldType.textarea";
-
-        if (field.type)
-          if (field.isEnum) {
-            //handle enum population & import
-            inputType = "FieldType.select";
-            fieldContentExtra += `    options: enumToObjectArray(${field.type})`;
-
-            if (!imports.includes("enumToObjectArray")) {
-              imports += `import { enumToObjectArray } from '@common/utilities/object.helpers';\n`;
-            }
-
-            if (!imports.includes(field.type)) {
-              imports += `import {  ${field.type}} from './${kebabName}.interface';\n`;
-            }
-          }
-
-        //prettier-ignore
-        if ( ["uid",'id'].includes(field.name)) fieldContentExtra += `    visible: false,\n`;
-
-        if (["Uid", "Id"].some((str) => field.name.endsWith(str))) {
-          inputType = "FieldType.select";
-          //prettier-ignore
-          let fieldType = field.name.charAt(0).toUpperCase() + field.name.slice(1,-3) // remove Uid
-          //ignore imports TODO: work imports
-
-          console.log(" ************************", fieldType);
-
-          let listQuery = this._getListQueryNameFromAll(fieldType, true);
-
-          //prettier-ignore
-          let listQueryName =  listQuery?.constantName ?? `ALL_${this._toScreamingSnake(fieldType)}_PAGEABLE`;
-
-          let typeDetails = ALL_TYPES.find((t) => t.name === fieldType);
-
-          // "@store/entities/accounting/fee/fee.model.ts"
-          //prettier-ignore
-          let prefixPath = typeDetails?.path?.split("/")?.slice(0, -1)?.join("/");
-
-          let kebab = this._toKebab(fieldType);
-
-          //prettier-ignore
-          let nameKeys =  typeDetails?.fields
-          ?.filter( (f) =>  ["string", "number"].includes(f.type) && this._isNameKey(f.name))
-          .map( f => f.name)
-
-          let nameKeysStr = nameKeys?.map((k) => `"${k}"`).join(", ");
-
-          //prettier-ignore
-          // if (prefixPath)   imports += `import { map${fieldType} } from "${prefixPath}/${kebab}.selectors";\n`;
-          //prettier-ignore
-          if (listQuery) imports += `import {  ${listQueryName} } from "${listQuery.path.slice(0,-3)}";\n`;
-
-          fieldContentExtra += `    optionsVariables : {\n`;
-          fieldContentExtra += `      fetchParameter:{ query:${listQueryName} },\n`;
-          //prettier-ignore
-          // fieldContentExtra += `      mapFunction: (o:any) => ({...o }),\n`;
-          //prettier-ignore
-          // if (nameKeysStr)  fieldContentExtra += `      searchKeys: [${nameKeysStr}],\n`;
-          // else  fieldContentExtra += `      searchKeys: [],// TODO: put in nameFields\n`;
-          fieldContentExtra += `    }\n`;
-        }
-
-        let fulls = ["textarea", "FormGroup", "formGroup"];
-
-        fieldContent += `  {\n`;
-        fieldContent += `    key: "${field.name}",\n`;
-        fieldContent += `    type: ${inputType},\n`;
-        // prettier-ignore
-        fieldContent += `    validations: ${field.required ? '[VALIDATOR_REQUIRED]':'[]'},\n`;
-        // prettier-ignore
-        if(fulls.some(s => inputType?.includes(s) )) fieldContent += `    class: "col-span-full",\n`;
-
-        fieldContent += fieldContentExtra;
-        fieldContent += innerfieldContent;
-        fieldContent += `  },\n`;
-      });
-
-      return fieldContent;
-    };
-
+    content += `//Listener for all ${entityName} actions \n`;
     content += `export const ${camelName}$ = new Subject<${entityName} | any>();\n`;
     content += `\n`;
 
     content += `export const get${entityName}FormFields = (comp: BaseComponent): FieldConfig[] => [\n`;
-    content += getFieldsContent(inputType?.fields); // add the fields
+
+    ////add the fields contents
+    const fieldsContents = this.getFormFieldsContents(inputType?.fields);
+    content += fieldsContents[0]; // add the fields
+    imports += fieldsContents[1]; // add the fields
+
     content += `];\n`;
     content += `\n`;
 
-    content += `export const get${entityName}Form = (comp: BaseComponent, data?: any): FormParameters => ({\n`;
-    content += `  fields: get${entityName}FormFields(comp),\n`;
-    content += `  title: '${titleName}',\n`;
-    content += `  model: data,\n`;
-    content += `\n`;
-
-    content += `   onSubmit: async (data: any) => {\n`;
-    content += `     await comp.fs.fetch({\n`;
-    content += `      notify: true,\n`;
-    content += `      variables: { ${camelName}Dto: data },\n`;
-    content += `      successFn: (res) => ${camelName}$.next(res?.data),\n`;
-    content += `      mutation: ${createQueryName},\n`;
-    content += `   });\n`;
-    content += `   },\n`;
-    content += ` });\n`;
-    content += `\n`;
-
     content += ` export async function open${entityName}Form(comp: BaseComponent, ${camelName}?: any) {\n`;
+    content += `  const formParameter: FormParameters = {\n`;
+    content += `    model: ${camelName},\n`;
+    content += `    title: '${titleName}',\n`;
+    content += `    fields: get${entityName}FormFields(comp),\n`;
+    content += `\n`;
+
+    let variables_ = `${createOperation?.params?.map((p) => `${p.name}:data`).join(", ")}`;
+
+    content += `    onSubmit: async (data: any) => {\n`;
+    content += `      await comp.fs.fetch({\n`;
+    content += `        notify: true,\n`;
+    content += `        variables: { ${variables_}},\n`;
+    content += `        mutation: ${createOperationName},\n`;
+    content += `        successFn: (res) => ${camelName}$.next(res?.data),\n`;
+    content += `      });\n`;
+    content += `   },\n`;
+    content += `  };\n`;
+    content += `\n`;
+
     content += `  comp.vs?.openDialog({\n`;
-    content += `    component: FormComponent,\n`;
-    content += `    data: get${entityName}Form(comp, ${camelName}),\n`;
     content += `    width: '96%',\n`;
-    content += `   maxWidth: '720px',\n`;
+    content += `    maxWidth: '720px',\n`;
+    content += `    data: formParameter,\n`;
+    content += `    component: FormComponent,\n`;
     content += `    closeAction$: ${camelName}$,\n`;
     content += `   });\n`;
     content += ` }\n`;
     content += `\n`;
 
-    content += `export function ${camelName}ViewBtn(comp: BaseComponent) {\n`;
-    content += `  return <ActionButton>{\n`;
-    content += `    label: 'View ${titleName}',\n`;
+    content += `export function ${camelName}ViewBtn(comp: BaseComponent):ActionButton {\n`;
+    content += `  return {\n`;
     content += `    icon: 'view',\n`;
+    content += `    label: 'View ${titleName}',\n`;
     content += `    click: (data: ${entityName}) => navigateRelativeTo(comp, '${kebabPlural}', data?.uid),\n`;
     content += `    permissions: [],\n`;
     content += `  };\n`;
     content += `}\n`;
     content += `\n`;
 
-    content += `export function ${camelName}UpsertBtn(comp: BaseComponent) {\n`;
-    content += `  return <ActionButton>{\n`;
+    content += `export function ${camelName}UpsertBtn(comp: BaseComponent):ActionButton {\n`;
+    content += `  return {\n`;
     content += `    ...getUpsertBtnProps('${titleName}'),\n`;
     content += `    click: (data?: ${entityName}) => open${entityName}Form(comp, data),\n`;
     content += `    permissions: [],\n`;
@@ -1089,27 +1089,35 @@ class NgRxGenerator {
     content += `}\n`;
     content += `\n`;
 
-    content += ` export function ${camelName}DeleteBtn(comp: BaseComponent) {\n`;
-    content += `  return <ActionButton>{\n`;
-    content += `    ...getDeleteBtnProps('${titleName}', 'name'),\n`;
+    const mainType = types.find((t) => t.name === entityName);
+    let businessKeys = this._getBusinessKeys(mainType);
+    let nameKeys = this._getNameKeys(mainType);
+
+    content += ` export function ${camelName}DeleteBtn(comp: BaseComponent):ActionButton {\n`;
+    content += `  return {\n`;
+    content += `    ...getDeleteBtnProps('${titleName}', '${nameKeys[0] ?? "name"}'),\n`;
     content += `    permissions: [],\n`;
     content += `\n`;
+
+    let variables = deleteOperation?.params
+      ?.map((p) => `${p.name}:data.uid`)
+      .join(", ");
 
     content += `    click: async (data: ${entityName}) => {\n`;
     content += `      await comp.fs.fetch({\n`;
     content += `        notify: true,\n`;
     content += `        loadingOn: 'content',\n`;
-    content += `        variables: { ${camelName}Uid: data.uid },\n`;
+    content += `        variables: { ${!!deleteOperation ? variables : "uid: 'data.uid'"}},\n`;
+    content += `        mutation: ${deleteOperationName},\n`;
     content += `        finalFn: (res) => ${camelName}$.next(res?.data),\n`;
-    content += `        mutation: ${deleteQueryName},\n`;
     content += `      });\n`;
     content += `    },\n`;
     content += `  };\n`;
     content += `}\n`;
     content += `\n`;
 
-    content += `export function ${camelName}TableBtns(comp: BaseComponent) {\n`;
-    content += `  return <ActionButton[]>[\n`;
+    content += `export function ${camelName}TableBtns(comp: BaseComponent):ActionButton[] {\n`;
+    content += `  return  [\n`;
     content += `    {\n`;
     content += `      ...MORE_BTN,\n`;
     content += `      buttons: [\n`;
@@ -1125,167 +1133,336 @@ class NgRxGenerator {
     return imports + "\n" + content;
   }
 
-  generateEntityComp(entityName, operations, types, entityGroup) {
+  getFormFieldsContents(fields) {
+    let fieldContent = "";
+    let imports = "";
+
+    fields?.forEach((field) => {
+      let inputType_ = this._graphqlToFormType(field);
+      let fieldContentExtra = "";
+      let innerfieldContent = "";
+
+      //prettier-ignore
+      let isObjOrObjArray = !this._isGqlType(field.type) && !field.isEnum;
+
+      if (isObjOrObjArray) {
+        let typeName = field.type;
+        let dtoType = this._getDtoType(types, typeName, true);
+        let innerFields = dtoType?.fields ?? [];
+
+        //prettier-ignore
+        inputType_ = field.isArray ? 'FieldType.formGroupArray':'FieldType.formGroup';
+        //prettier-ignore
+        let contents_ = this._addTabsToEachLine(getFieldsContent(innerFields), 2, [0])
+
+        innerfieldContent += `    fields:[\n`;
+        innerfieldContent += `    ${contents_}`;
+        innerfieldContent += `],\n`;
+      }
+
+      let textareas = ["description", "summary", "remark"];
+      if (textareas.includes(field.name)) inputType_ = "FieldType.textarea";
+
+      if (field.type)
+        if (field.isEnum) {
+          //handle enum population & import
+          inputType_ = "FieldType.select";
+          fieldContentExtra += `    options: enumToObjectArray(${field.type})`;
+
+          if (!imports.includes("enumToObjectArray")) {
+            imports += `import { enumToObjectArray } from '@common/utilities/object.helpers';\n`;
+          }
+
+          if (!imports.includes(field.type)) {
+            imports += `import {  ${field.type}} from './${kebabName}.interface';\n`;
+          }
+        }
+
+      //prettier-ignore
+      if ( ["uid",'id'].includes(field.name)) fieldContentExtra += `    visible: false,\n`;
+
+      if (["Uid", "Id"].some((str) => field.name.endsWith(str))) {
+        inputType_ = "FieldType.select";
+        //prettier-ignore
+        let fieldType = field.name.charAt(0).toUpperCase() + field.name.slice(1,-3) // remove Uid
+        //ignore imports TODO: work imports
+
+        console.log(" ************************", fieldType);
+
+        let listQuery = this._getListOperationFromAll(fieldType, true);
+
+        //prettier-ignore
+        let listQueryName =  listQuery?.constantName ?? `ALL_${this._toScreamingSnake(fieldType)}_PAGEABLE`;
+
+        let typeDetails = ALL_TYPES.find((t) => t.name === fieldType);
+
+        // "@store/entities/accounting/fee/fee.model.ts"
+        //prettier-ignore
+        let prefixPath = typeDetails?.path?.split("/")?.slice(0, -1)?.join("/");
+
+        let kebab = this._toKebab(fieldType);
+
+        //prettier-ignore
+        let nameKeys =  typeDetails?.fields
+          ?.filter( (f) =>  ["string", "number"].includes(f.type) && this._isNameKey(f.name))
+          .map( f => f.name)
+
+        let nameKeysStr = nameKeys?.map((k) => `"${k}"`).join(", ");
+
+        //prettier-ignore
+        // if (prefixPath)   imports += `import { map${fieldType} } from "${prefixPath}/${kebab}.selectors";\n`;
+        //prettier-ignore
+        if (listQuery) imports += `import {  ${listQueryName} } from "${listQuery.path.slice(0,-3)}";\n`;
+
+        fieldContentExtra += `    optionsVariables : {\n`;
+        fieldContentExtra += `      fetchParameter:{ query:${listQueryName} },\n`;
+        //prettier-ignore
+        // fieldContentExtra += `      mapFunction: (o:any) => ({...o }),\n`;
+        //prettier-ignore
+        // if (nameKeysStr)  fieldContentExtra += `      searchKeys: [${nameKeysStr}],\n`;
+        // else  fieldContentExtra += `      searchKeys: [],// TODO: put in nameFields\n`;
+        fieldContentExtra += `    }\n`;
+      }
+
+      let fulls = ["textarea", "FormGroup", "formGroup"];
+
+      fieldContent += `  {\n`;
+      fieldContent += `    key: "${field.name}",\n`;
+      fieldContent += `    type: ${inputType_},\n`;
+      // prettier-ignore
+      fieldContent += `    validations: ${field.required ? '[VALIDATOR_REQUIRED]':'[]'},\n`;
+      // prettier-ignore
+      if(fulls.some(s => inputType_?.includes(s) )) fieldContent += `    class: "col-span-full",\n`;
+
+      fieldContent += fieldContentExtra;
+      fieldContent += innerfieldContent;
+      fieldContent += `  },\n`;
+    });
+
+    return [fieldContent, imports];
+  }
+
+  generateEntityComp(entityName, operations, types) {
     const kebabName = this._toKebab(entityName);
     const titleName = this._toTitleCase(entityName);
     const camelName = this._toCamelCase(entityName);
 
-    const entityGroup_ = !!entityGroup ? `${entityGroup}/` : ``;
     const mainType = types.find((t) => t.name === entityName);
-    let queryName = this._getSingleQueryName(entityName, operations);
-
-    let imports = "";
-    imports += `import { Component, OnInit } from "@angular/core";\n`;
-    imports += `import { ANIMATION, QueryParameter, COMMON_FIELD_STRINGS, HIGHLIGHT  } from "@shared";\n`;
-    imports += `import { ActionListener  } from "@shared";\n`;
-    imports += `import { BaseComponent } from "@shared/view/base-component";\n`;
-    imports += `import { cloneDeep } from "@apollo/client/utilities";\n`;
-    imports += `import { ViewParameter } from "@shared/components/view-component/view-interface";\n`;
-    imports += `import { ContentParameter } from "@shared/components/view-component/view-interface";\n`;
-    imports += `import { get${entityName}UpsertButton } from "./${kebabName}.form";\n`;
-    imports += `import { ${entityName}Actions } from "@store/entities/${entityGroup_}${kebabName}/${kebabName}.actions";\n`;
-    imports += `import { ${entityName} } from "@store/entities/${entityGroup_}${kebabName}/${kebabName}.model";\n`;
-    imports += `import { map${entityName} } from "@store/entities/${entityGroup_}${kebabName}/${kebabName}.selectors";\n`;
-
     //prettier-ignore
-    if (queryName) imports += `import { ${queryName} } from "@store/entities/${entityGroup_}${kebabName}/${kebabName}.graphql";\n`;
+    const findOperationName = this._getFindOperationName(entityName, operations);
+    const findOperation = this._getFindOperation(entityName, operations);
 
-    let content = "";
-    content += `@Component({\n`;
-    content += `  selector: "app-${kebabName}",\n`;
-    //prettier-ignore
-    content +="   template: "+ "`"+ `<view-component [viewParameter]="viewParameter"></view-component>`+ "`\n"
-    content += `})\n`;
-    content += `export class ${entityName}Component extends BaseComponent implements OnInit {\n`;
-    content += `  title = "${titleName}";\n`;
-    content += `  animation = ANIMATION;\n`;
-    content += `  viewParameter: ViewParameter;\n\n`;
-
-    content += `  ${camelName}: ${entityName};\n`;
-    content += `  reloadActions = [ ${entityName}Actions.upsert${entityName} ];\n\n`;
-
-    content += `  async ngOnInit(): Promise<void> {\n`;
-    content += `    await this.loadData();\n`;
-    content += `    this.setContentParameters();\n`;
-    content += `    this.onNavigateToSelf(() => this.ngOnInit());\n`;
-    content += `  }\n\n`;
-
-    content += `  async loadData() {\n`;
-    content += `    let query = ${queryName};\n`;
-    content += `    let qp: QueryParameter = { mapFunction: map${entityName} };\n`;
-    content += `    let uid = this.route.snapshot?.paramMap?.get("uid");\n`;
-    content += `    this.${camelName} = cloneDeep(await this.fs.getData(qp, query, uid));\n`;
-    content += `  }\n\n`;
-
-    let nameKeys = this._getNameKeys(mainType);
-    //prettier-ignore
-    let highlightLine =   nameKeys?.length  ? "`"  +  nameKeys.join(', ')   + " valueClass(${HIGHLIGHT})`,\n": ''
-
-    content += `  setContentParameters() {\n`;
-    content += `    let data = {${camelName}Uid:this.${camelName}.uid};\n`;
-    //prettier-ignore
-    content += `    let subtitle = this.${camelName}.${this._getNameKeys(mainType)?.[0]};\n\n`;
-
-    content += `    let contentsParameters: ContentParameter[] = [\n`;
-    content += `      {\n`;
-    content += `        icon: "item",\n`;
-    content += `        type: "details",\n`;
-    content += `        slug: "${kebabName}",\n`;
-    content += `        name: subtitle,\n`;
-
-    content += `        headerButtons: [get${entityName}UpsertButton(this, false, "edit")],\n`;
-    content += `        entity: this.${camelName},\n\n`;
-    content += `        fieldsStrings:[\n`;
-    content += `          ${highlightLine}`;
-    content += `          ...COMMON_FIELD_STRINGS,\n`;
-    content += `        ],\n\n`;
-
-    content += `        children: [\n`;
+    const businessKeys = this._getBusinessKeys(mainType);
+    const nameKeys = this._getNameKeys(mainType);
 
     let nonGqlTypes = this._getNonGraphQLTypes(mainType);
     //prettier-ignore
-    let arrayFields = mainType.fields.filter((f) => f.isArray && nonGqlTypes.includes(f.type) );
+    const arrayFields = mainType.fields.filter((f) => f.isArray && nonGqlTypes.includes(f.type) );
+
+    let imports = "";
+
+    //prettier-ignore
+    if (!arrayFields.length)  imports += `import { BehaviorSubject } from 'rxjs';\n`;
+    imports += `import { Component ${arrayFields.length ? ", OnInit" : ""} } from "@angular/core";\n`;
+    imports += `import { CommonModule } from "@angular/common";\n`;
+    imports += `import { PageHeaderComponent } from "@common/page-header.component";\n`;
+    //prettier-ignore
+    if (!arrayFields.length)   imports += `import { ToObservablePipe } from '@common/pipes/to-observable.pipe';\n`;
+    imports += `import { BaseComponent } from "@common/components/base-componet/base-component";\n`;
+    imports += `import { ContentParameter } from "@common/components/contents-view/view.interface";\n`;
+    imports += `import { ActionButton } from "@common/components/action-buttons/action-buttons.inteface";\n`;
+    imports += `import { ContentsViewComponent } from "@common/components/contents-view/contents-view.component";\n`;
+
+    imports += `\n`;
+    imports += `import { ${entityName} } from "./${kebabName}.interface";\n`;
+    //prettier-ignore
+    if (findOperationName) imports += `import { ${findOperationName} } from "./${kebabName}.graphql";\n`;
+    imports += `import { ${camelName}UpsertBtn, ${camelName}$ } from "./${kebabName}.form";\n`;
+
+    let content = "";
+    content += `@Component({\n`;
+    content += `  selector: 'app-${kebabName}.',\n`;
+    content += `  imports: [CommonModule, PageHeaderComponent, ContentsViewComponent ${!arrayFields.length ? ",ToObservablePipe" : ""}],\n`;
+    content += "  template: `\n";
+    content += `    <!--  -->\n`;
+    content += `    <div class="flex-1 flex flex-col gap-2">\n`;
+    content += `      <app-page-header\n`;
+    content += `        [title]="title"\n`;
+    content += `        [subtitle]="subtitle"\n`;
+    content += `        [actionButtons]="actionButtons"\n`;
+
+    //prettier-ignore
+    if(arrayFields.length) content += `        [data]="${camelName}"\n`;
+    //prettier-ignore
+    else content += `        [data]="fetchParameter?.data$ | toObservable | async"\n`;
+
+    content += `      />\n`;
+
+    content += `      <contents-view class="block grow" [contents]="contents" />\n`;
+    content += `    </div>\n`;
+    content += "   `\n";
+    content += `})\n`;
+
+    content += `export class ${entityName}Component extends BaseComponent ${arrayFields.length ? "implements OnInit" : ""} {\n`;
+    content += `  override title = '${titleName}';\n`;
+    content += `  override subtitle = '${titleName} Management';\n`;
+
+    if (arrayFields.length) {
+      content += `\n`;
+      content += `  ${camelName}: ${entityName} | undefined;\n`;
+      content += `  override contents: ContentParameter[] = [];\n`;
+    }
+
+    content += `  override actionButtons: ActionButton[] = [${camelName}UpsertBtn(this)];\n`;
+    content += `\n`;
+
+    let uid = `this.route.snapshot?.paramMap?.get('${camelName}Uid')`;
+
+    //prettier-ignore
+    let variables = findOperation?.params?.map((p) => `${p.name}:${uid}`).join(", ");
+
+    content += `  fetchParameter: FetchParameter = {\n`;
+    content += `    loadingOn: 'no-content',\n`;
+    content += `    query: ${findOperationName},\n`;
+
+    //prettier-ignore
+    if (!arrayFields.length)  content += `    refetchActions: [${camelName}$],\n`;
+
+    content += `    data$: new BehaviorSubject<${entityName}>(),\n`;
+    content += `    successFn:(res) => this.title = res?.data?.${nameKeys?.[0] ?? "name"},\n`;
+    content += `    variables: { ${!!findOperation ? variables : "{uid:" + uid + "}"}},\n`;
+    content += `  };\n`;
+    content += `\n`;
+
+    let items = this.getContentContents(entityName, mainType, arrayFields);
+    imports += items[1];
+
+    if (arrayFields.length) {
+      content += `  async ngOnInit(): Promise<void> {\n`;
+      content += `    await this.setContents();\n`;
+      content += `    this.subs.add(${camelName}$.subscribe(() => this.setContents()));\n`;
+      content += `  }\n`;
+      content += `\n`;
+
+      content += `  async setContents() {\n`;
+      content += `    this.${camelName} = await this.fs.fetch(this.fetchParameter);\n`;
+      content += `\n`;
+
+      content += items[0];
+
+      content += `  }\n`;
+    } else {
+      content += this._removeTabsFromEachLine(items[0], 2);
+    }
+
+    content += `\n`;
+    content += `}\n`;
+    //------------------------------------
+    return imports + `\n` + content;
+  }
+
+  getContentContents(entityName, mainType, arrayFields) {
+    const camelName = this._toCamelCase(entityName);
+    let content = "";
+    let imports = "";
+
+    if (arrayFields.length) content += `    this.contents = [\n`;
+    else content += `    override contents:ContentParameter = [\n`;
+
+    content += `      {\n`;
+    content += `        type: 'details',\n`;
+    content += `        icon: 'notes',\n`;
+    content += `        showUndefined: true,\n`;
+    if (arrayFields.length) content += `        entity: this.${camelName},\n`;
+    content += `        fetchParameter: this.fetchParameter,\n`;
+
+    if (arrayFields.length) {
+      //prettier-ignore
+      let items =   this.getEntityChildrenContents(entityName, mainType, arrayFields)
+      content += items[0];
+      imports += items[1];
+    }
+
+    content += `      },\n`;
+    content += `    ];\n`;
+
+    return [content, imports];
+  }
+
+  getEntityChildrenContents(entityName, mainType, arrayFields) {
+    const camelName = this._toCamelCase(entityName);
+    const businessKeys = this._getBusinessKeys(mainType);
+
+    if (!arrayFields.length) return "";
+    let content = "";
+    let imports = "";
+
+    content += `        children: [\n`;
 
     arrayFields.forEach((field) => {
-      let type = field.type;
+      const childEntityName = field.type;
+      const childCamel = this._toCamelCase(childEntityName);
+      const childTitle = this._toTitleCase(childEntityName);
+      const childKebab = this._toKebab(childEntityName);
       //ignore imports TODO: work imports
 
-      let listQuery = this._getListQueryNameFromAll(type);
+      const childListOp = this._getListOperationFromAll(childEntityName);
       //prettier-ignore
-      let listQueryName =  listQuery?.constantName ?? `ALL_${this._toScreamingSnake(type)}_PAGEABLE`;
-      let typeDetails = ALL_TYPES.find((t) => t.name === type);
+      const childListOpName =  childListOp?.constantName ?? undefined;
+      //prettier-ignore
+      const childTypeDetails = ALL_TYPES.find((t) => t.name === childEntityName);
+      //prettier-ignore
+      let childPrefixPath = childTypeDetails?.path?.split("/")?.slice(0, -1)?.join("/");
 
-      // "@store/entities/accounting/fee/fee.model.ts" //dont put .ts if using @
-
-      let prefixPath = typeDetails?.path?.split("/")?.slice(0, -1)?.join("/");
-      let kebab = this._toKebab(type);
-
-      // console.log(listQuery, prefixPath);
-
-      if (prefixPath) {
-        imports += `import { get${type}UpsertButton } from "./${kebab}.form";\n`;
-        imports += `import { get${type}Buttons } from "./${kebab}.form";\n`;
-        imports += `import { ${type}Actions } from "${prefixPath}/${kebab}.actions";\n`;
-        imports += `import { ${type} } from "${prefixPath}/${kebab}.model";\n`;
-        imports += `import { map${type} } from "${prefixPath}/${kebab}.selectors";\n`;
+      if (childPrefixPath) {
+        imports += `import { ${childEntityName}UpsertBtn } from "./${childKebab}.form";\n`;
+        imports += `import { ${childEntityName}TableBtns } from "./${childKebab}.form";\n`;
+        imports += `import { ${childEntityName} } from "${childPrefixPath}/${childKebab}.interface";\n`;
       }
       //prettier-ignore
-      if (listQuery) imports += `import { ${listQueryName} } from "${listQuery.path} ";\n`;
+      if (childListOp) imports += `import { ${childListOpName} } from "${childListOp.path} ";\n`;
+
+      let uid = `this.route.snapshot?.paramMap?.get('${camelName}Uid')`;
+      //prettier-ignore
+      // let childVariables = findOperation?.params?.map((p) => `${p.name}:${uid}`).join(", ");
+      let childDefaultVar = `uid:${uid}`;
 
       content += `          {\n`;
       content += `            type: "table",\n`;
-      content += `            slug: "${this._toKebab(type)}",\n`;
-      content += `            name: "${this._toTitleCase(type)}",\n`;
-      content += `            icon: "item",\n`;
+      content += `            slug: "${childKebab}",\n`;
+      content += `            label: "${childTitle}",\n`;
+      content += `            icon: "circle",\n`;
       //prettier-ignore
-      content += `            columnsKeys: [${this._getBusinessKeys(mainType).slice(0,6).map(k => "'"+k+"'").join(', ')}],\n`;
-      content += `            searchStatesValues: [{ key: "${camelName}.uid", value: this.${camelName}.uid }],\n`;
-      content += `            mapFunction: map${type},\n`;
-      content += `            actionButtons: get${type}Buttons(this, data),\n`;
-      content += `            headerButtons: [get${type}UpsertButton(this, false, "add", data)], \n`;
-      //prettier-ignore
-      content += `            query: ${listQueryName}, //TODO: put query\n`;
-      //prettier-ignore
-      content += `            reloadActions: [${type}Actions.upsert${type}, ${type}Actions.delete${type}],\n`;
+      content += `            keyColumns: [${businessKeys.slice(0,6).map(k => "'"+k+"'").join(', ')}],\n`;
+      // content += `            headerButtons: [ ${childCamel}UpsertBtn(this) ], \n`;
+      // content += `            actionButtons: ${childCamel}TableBtns(this),\n`;
+      // content += `            reloadActions$: [${childCamel}$],\n`;
+      // content += `            fetchParameter: { query: ${childListOpName}, variables:{${childVariables ? variables : childDefaultVar}} },\n`;
+      content += `            gridData: this.${camelName}.${field.name},\n`;
       content += `          },\n`;
     });
 
     content += `        ],\n`;
-    content += `      },\n`;
-    content += `    ];\n\n`;
 
-    content += `    //set view\n`;
-    content += `    this.viewParameter = {\n`;
-    content += `      animation: this.animation,\n`;
-    content += `      title: this.title,\n`;
-    //prettier-ignore
-    content += `      subtitle: subtitle,\n`;
-    content += `      contentsParameters,\n`;
-    content += `    };\n`;
-    content += `  }\n\n`;
-
-    content += `  listenToActions() {\n`;
-    content += `    const listeners: ActionListener[] = [\n`;
-    content += `      { actions: [...this.reloadActions], callback: () => this.loadData()},\n`;
-    content += `    ];\n\n`;
-
-    content += `    this.addActionListeners(listeners);\n`;
-    content += `  }\n`;
-
-    content += `}\n`;
-
-    return imports + `\n` + content;
+    return [content, imports];
   }
 
-  generateFiles(schema, outputDir = ".", entityName, groupName) {
+  generateFiles(schema, outputDir = ".", entityName) {
     //get entities lop schema for entities
 
     const { types, operations } = this.parseGraphqlSchema(schema);
 
     //for now just use the first entity non enum non dto
     //later to do this, getMainTypes ->, getDtos, getEnums -> types , operates
-    //prettier-ignore
-    if (!entityName)  MAIN_TYPE = entityName = types.find((t) => !t.isEnum && !t.name.includes("Dto"))?.name;
+
+    if (!entityName) {
+      MAIN_TYPE = entityName = types.find(
+        (t) =>
+          !t.isEnum &&
+          !["dto", "input"].some((s) => t.name.toLowerCase().includes(s)),
+      )?.name;
+    }
+
     //prettier-ignore
     if (!entityName) MAIN_TYPE = entityName = types.find((t) => !t.isEnum && !t.name.includes("Dto"))?.name;
     //prettier-ignore
@@ -1310,15 +1487,15 @@ class NgRxGenerator {
 
     const entityFiles = {
       //prettier-ignore
-      [`${kebabName}.interfaces.ts`]: this.generateInterfaceFile(entityName, modTypes),
+      [`${kebabName}.interface.ts`]: this.generateInterfaceFile(entityName, modTypes),
       //prettier-ignore
       [`${kebabName}.graphql.ts`]: this.generateGraphqlFile( entityName, operations, modTypes ),
       //prettier-ignore
-      [`${kebabName}.form.ts`]: this.generateFormFile(entityName,operations, modTypes, groupName),
+      [`${kebabName}.form.ts`]: this.generateFormFile(entityName,operations, modTypes  ),
       //prettier-ignore
-      [`${kebabName}.component.ts`]: this.generateEntityComp(entityName, operations, modTypes, groupName),
+      [`${kebabName}.component.ts`]: this.generateEntityComp(entityName, operations, modTypes ),
       //prettier-ignore
-      [`${kebabPlural}.component.ts`]: this.generateEntityListComp(entityName, operations, modTypes,groupName),
+      [`${kebabPlural}.component.ts`]: this.generateEntityListComp(entityName, operations, modTypes ),
     };
 
     const fileDirs = [{ dir: entityDir, files: entityFiles }];
@@ -1362,7 +1539,7 @@ function main() {
 
   try {
     const schema = fs.readFileSync(schemaFile, "utf8");
-    const generator = new NgRxGenerator();
+    const generator = new EntityGenerator();
     generator.generateFiles(entityName, schema, outputDir);
     console.log(`\nSuccessfully generated NgRx files for ${entityName}`);
   } catch (error) {
@@ -1372,9 +1549,14 @@ function main() {
 }
 
 // Module exports
-function generateFromString(schema, outputDir = ".", entityName, groupName) {
-  const generator = new NgRxGenerator();
-  generator.generateFiles(schema, outputDir, entityName, groupName);
+//prettier-ignore
+function generateFromString(schema, outputDir = ".", entityName, projectAppPath ) {
+  if(!projectAppPath) projectAppPath= "X:/Work/WorkY/Apps/LSMIS/lsmis-frontend/src/app";
+  ALL_TYPES = analyzeStoreTypes(projectAppPath);
+  // console.log(ALL_TYPES);
+
+  const generator = new EntityGenerator();
+  generator.generateFiles(schema, outputDir, entityName);
 }
 
 let ALL_TYPES = [];
@@ -1386,23 +1568,19 @@ if (require.main === module) {
     main();
   } else {
     // Generate example files
-
     let schemas = ["schemas/schema.gql"];
-
-    let contextPath = "X:/Work/WorkY/Apps/LSMIS/lsmis-frontend/src/app";
-    ALL_TYPES = analyzeStoreTypes(contextPath);
 
     schemas.forEach((src) => {
       console.log(`Generating files for ${src} ...`);
       let schema = fs.readFileSync(src, "utf8");
-      generateFromString(schema, "generated", undefined, "accounts");
+      generateFromString(schema, "generated", undefined, undefined);
       console.log(`files for ${src} Generated`);
     });
   }
 }
 
 module.exports = {
-  NgRxGenerator,
+  EntityGenerator,
   generateFromString,
   Field,
   TypeDef,
