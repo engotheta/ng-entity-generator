@@ -7,16 +7,13 @@ id: UUID
 Mutation.changeTaskCategoryStatus(
 id: UUID
 ): Response_TaskCategory
+Query.getAllTaskCategories: [TaskCategoryResponse]
+Query.searchTaskCategories(
+filter: TaskCategoryFilterInput
+): [TaskCategoryResponse]
 Query.findTaskCategoryById(
 id: UUID
 ): Response_TaskCategory
-
-type TaskCategoryRequestInput {
-code: String!
-description: String
-id: UUID
-name: String!
-}
 
 type TaskCategory {
 active: Boolean
@@ -41,4 +38,11 @@ description: String
 name: String
 updatedAt: LocalDateTime
 uuid: UUID
+}
+
+type TaskCategoryRequestInput {
+code: String!
+description: String
+id: UUID
+name: String!
 }

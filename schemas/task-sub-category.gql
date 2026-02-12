@@ -1,0 +1,49 @@
+Mutation.changeTaskSubcategoryStatus(
+id: UUID
+): Response_TaskSubcategory
+Mutation.createOrUpdateTaskSubcategory(
+request: TaskSubcategoryRequestInput
+): Response_TaskSubcategory
+Mutation.deleteTaskSubcategory(
+id: UUID
+): Response_TaskSubcategory
+Query.findTaskSubcategoryById(
+id: UUID
+): Response_TaskSubcategory
+
+type TaskSubcategory {
+active: Boolean
+category: TaskCategory!
+code: String!
+description: String
+name: String!
+}
+
+type TaskSubcategoryFilterInput {
+active: Boolean
+categoryId: Long
+code: String
+id: Long
+name: String
+uid: UUID
+}
+type TaskSubcategoryRequestInput {
+categoryId: UUID!
+code: String!
+description: String
+id: UUID
+name: String!
+}
+
+type TaskSubcategoryResponse {
+active: Boolean
+categoryDetails: TaskCategoryResponse
+categoryId: UUID
+categoryName: String
+code: String
+createdAt: LocalDateTime
+description: String
+name: String
+updatedAt: LocalDateTime
+uuid: UUID
+}

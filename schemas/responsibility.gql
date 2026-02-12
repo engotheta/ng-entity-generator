@@ -1,0 +1,44 @@
+Mutation.changeResponsibilityStatus(
+id: UUID
+): Response_Responsibility
+Mutation.deleteResponsibility(
+id: UUID
+): Response_Responsibility
+Mutation.createResponsibility(
+ent: ResponsibilityRequestInput
+): Response_Responsibility
+Query.findResponsibilityById(
+id: UUID
+): Response_Responsibility
+Query.searchResponsibility(
+filter: ResponsibilityFilterInput
+pagination: PaginationInput
+): Response_Page_ResponsibilityResponse
+
+type Responsibility {
+active: Boolean!
+description: String!
+name: String!
+}
+
+type ResponsibilityFilterInput {
+active: Boolean
+id: Long
+name: String
+uid: UUID
+}
+
+type ResponsibilityRequestInput {
+areaIds: [UUID]!
+description: String!
+id: UUID
+name: String!
+}
+
+type ResponsibilityResponse {
+active: Boolean
+areas: [AreaResponse]
+description: String
+name: String
+uuid: UUID
+}

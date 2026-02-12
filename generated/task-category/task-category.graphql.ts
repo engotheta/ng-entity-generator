@@ -17,6 +17,9 @@ export const taskCategoryGqlFields = `
   code
   description
   name
+  createdAt
+  updatedAt
+  uuid
 `;
 
 //   

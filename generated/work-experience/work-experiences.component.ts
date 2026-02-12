@@ -5,12 +5,12 @@ import { DataGridComponent } from '@common/components/data-grid/data-grid.compon
 import { ActionButton } from '@common/components/action-buttons/action-buttons.inteface';
 import { GridParameter, GridKeyColumn } from '@common/components/data-grid/data-grid.interfaces';
 
-import { GET_ALL_TASK_CATEGORIES } from './task-category.graphql';
-import { taskCategoryUpsertBtn } from './task-category.form';
-import { taskCategoryTableBtns, taskCategory$ } from './task-category.form';
+import { CHANGE_WORK_EXPERIENCE_STATUS } from './work-experience.graphql';
+import { workExperienceUpsertBtn } from './work-experience.form';
+import { workExperienceTableBtns, workExperience$ } from './work-experience.form';
 
 @Component({
-  selector: 'app-task-categories',
+  selector: 'app-work-experiences',
   imports: [DataGridComponent, PageHeaderComponent],
   template: ` 
     <div class="flex-1 flex flex-col gap-3 ">
@@ -19,20 +19,20 @@ import { taskCategoryTableBtns, taskCategory$ } from './task-category.form';
     </div>
   `,
 })
-export class TaskCategoriesComponent extends BaseComponent {
-  override title: string = 'Task Categories Management';
-  override subtitle: string = 'Task Categories List';
-  override actionButtons: ActionButton[] = [taskCategoryUpsertBtn(this)];
+export class WorkExperiencesComponent extends BaseComponent {
+  override title: string = 'Work Experiences Management';
+  override subtitle: string = 'Work Experiences List';
+  override actionButtons: ActionButton[] = [workExperienceUpsertBtn(this)];
 
-  keyColumns: GridKeyColumn[] = ['index','name', 'code', 'description', 'actions'];
+  keyColumns: GridKeyColumn[] = ['index','institutionName', 'attorney', 'currentlyWorkingHere', 'endDate', 'position', 'startDate', 'actions'];
 
   gridParameter: GridParameter = {
-     title: 'Task Categories',
+     title: 'Work Experiences',
      icon: 'info_circle',
      keyColumns: this.keyColumns,
-     actionButtons: taskCategoryTableBtns(this),
-     reloadActions$: [taskCategory$],
-     fetchParameter: { query: GET_ALL_TASK_CATEGORIES },
+     actionButtons: workExperienceTableBtns(this),
+     reloadActions$: [workExperience$],
+     fetchParameter: { query: CHANGE_WORK_EXPERIENCE_STATUS },
    };
 
 }

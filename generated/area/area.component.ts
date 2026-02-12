@@ -9,12 +9,12 @@ import { FetchParameter } from '@common/services/fetch.service';
 import { ActionButton } from "@common/components/action-buttons/action-buttons.inteface";
 import { ContentsViewComponent } from "@common/components/contents-view/contents-view.component";
 
-import { TaskCategory } from "./task-category.interface";
-import { FIND_TASK_CATEGORY_BY_ID } from "./task-category.graphql";
-import { taskCategoryUpsertBtn, taskCategory$ } from "./task-category.form";
+import { Area } from "./area.interface";
+import { FIND_AREA_BY_ID } from "./area.graphql";
+import { areaUpsertBtn, area$ } from "./area.form";
 
 @Component({
-  selector: 'app-task-category.',
+  selector: 'app-area.',
   imports: [CommonModule, PageHeaderComponent, ContentsViewComponent ,ToObservablePipe],
   template: `
     <!--  -->
@@ -29,18 +29,18 @@ import { taskCategoryUpsertBtn, taskCategory$ } from "./task-category.form";
     </div>
    `
 })
-export class TaskCategoryComponent extends BaseComponent  {
-  override title = 'Task Category';
-  override subtitle = 'Task Category Management';
-  override actionButtons: ActionButton[] = [taskCategoryUpsertBtn(this)];
+export class AreaComponent extends BaseComponent  {
+  override title = 'Area';
+  override subtitle = 'Area Management';
+  override actionButtons: ActionButton[] = [areaUpsertBtn(this)];
 
   fetchParameter: FetchParameter = {
     loadingOn: 'no-content',
-    query: FIND_TASK_CATEGORY_BY_ID,
-    refetchActions: [taskCategory$],
-    data$: new BehaviorSubject<TaskCategory | undefined>(undefined),
+    query: FIND_AREA_BY_ID,
+    refetchActions: [area$],
+    data$: new BehaviorSubject<Area | undefined>(undefined),
     successFn:(res) => this.title = res?.data?.name,
-    variables: { id:this.route.snapshot?.paramMap?.get('taskCategoryUid')},
+    variables: { id:this.route.snapshot?.paramMap?.get('areaUid')},
   };
 
   override contents:ContentParameter[] = [

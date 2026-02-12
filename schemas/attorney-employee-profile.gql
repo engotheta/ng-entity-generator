@@ -1,0 +1,51 @@
+Query.attorneyEmployeeProfile(
+uid: UUID
+): Response_AttorneyEmployeeResponse
+
+
+type AttorneyEmployee {
+active: Boolean
+checkNumber: Long
+confirmationDate: LocalDate
+contractEndDate: LocalDate
+contractStartDate: LocalDate
+departmentName: String
+designationName: String
+employmentStatusName: String
+fileNumber: String
+forAppointment: Boolean
+hasUpdates: Boolean
+hireDate: LocalDate
+institutionName: String
+jobClassName: String
+mapped: Boolean
+organizationName: String
+publicServant: Boolean
+recategorizationDate: LocalDate
+sectionName: String
+workstation: String
+}
+
+type AttorneyEmployeeResponse {
+active: Boolean
+checkNumber: Long
+confirmationDate: LocalDate
+contractEndDate: LocalDate
+contractStartDate: LocalDate
+departmentName: String
+designationName: String
+employmentStatusName: String
+fileNumber: String
+forAppointment: Boolean
+hasUpdates: Boolean
+hireDate: LocalDate
+institutionName: String
+jobClassName: String
+mapped: Boolean
+organizationName: String
+publicServant: Boolean
+recategorizationDate: LocalDate
+sectionName: String
+uid: UUID
+workstation: String
+}

@@ -1,0 +1,75 @@
+type Area {
+active: Boolean!
+code: String!
+description: String!
+name: String!
+}
+type AreaFilterInput {
+active: Boolean
+code: String
+id: Long
+name: String
+uid: UUID
+}
+
+type AreaResponse {
+active: Boolean
+code: String
+description: String
+name: String
+uuid: UUID
+}
+
+type AreaRequestInput {
+code: String!
+description: String!
+id: UUID
+name: String!
+}
+
+Mutation.createArea(
+ent: AreaRequestInput
+): Response_Area
+
+Mutation.changeAreaStatus(
+id: UUID
+): Response_Area
+
+Mutation.addAreasToTask(
+taskUuid: UUID!
+areaUuids: [UUID]!
+): Response_Integer
+
+Mutation.removeAreaFromTask(
+uuid: UUID!
+): Response_Boolean
+
+Mutation.addAreaToTask(
+request: TaskAreaRequestInput
+): Response_TaskArea
+
+Mutation.replaceAreasForTask(
+taskUuid: UUID!
+areaUuids: [UUID]!
+): Response_Integer
+
+Mutation.deleteArea(
+id: UUID
+): Response_Area
+
+Query.countTasksByArea(
+areaUuid: UUID!
+): Response_Long
+
+Query.countAreasByTask(
+taskUuid: UUID!
+): Response_Long
+
+Query.findAreaById(
+id: UUID
+): Response_Area
+
+Query.searchArea(
+filter: AreaFilterInput
+pagination: PaginationInput
+): Response_Page_AreaResponse

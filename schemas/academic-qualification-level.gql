@@ -1,0 +1,51 @@
+Mutation.changeAcademicQualificationLevelStatus(
+id: UUID
+): Response_AcademicQualificationsLevel
+Mutation.deleteAcademicQualificationLevel(
+id: UUID
+): Response_AcademicQualificationsLevel
+Mutation.createAcademicQualificationLevel(
+ent: AcademicQualificationLevelRequestInput
+): Response_AcademicQualificationsLevel
+Query.findAcademicQualificationLevelById(
+id: UUID
+): Response_AcademicQualificationsLevel
+Query.searchAcademicQualificationLevel(
+filter: AcademicQualificationLevelFilterInput
+): [AcademicQualificationLevelResponse]
+
+type AcademicQualificationLevel {
+active: Boolean!
+code: String!
+createdAt: LocalDateTime
+createdBy: Long
+deleted: Boolean!
+deletedAt: LocalDateTime
+name: String!
+uid: UUID
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type AcademicQualificationLevelFilterInput {
+active: Boolean
+code: String
+id: Long
+name: String
+uid: UUID
+}
+
+type AcademicQualificationLevelRequestInput {
+code: String!
+id: UUID
+name: String!
+}
+
+type AcademicQualificationLevelResponse {
+active: Boolean
+code: String
+name: String
+uuid: UUID
+}
+
+

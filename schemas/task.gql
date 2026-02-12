@@ -1,0 +1,29 @@
+type TaskRequestInput {
+  areaIds: [UUID]
+  attorneyIds: [UUID]
+  challenges: String
+  code: String!
+  description: String
+  duration: BigDecimal
+  finishDate: LocalDateTime!
+  id: UUID
+  name: String!
+  startDate: LocalDateTime!
+  status: TaskStatus
+  subcategoryId: UUID!
+}
+type Task {
+  active: Boolean
+  areas: [TaskArea]
+  attorneys: [TaskAttorney]
+  challenges: String
+  code: String!
+  description: String
+  duration: BigDecimal
+  finishDate: LocalDateTime!
+  name: String!
+  startDate: LocalDateTime!
+  status: TaskStatus
+  subcategory: TaskSubcategory!
+  taskedAt: LocalDateTime
+}

@@ -1,7 +1,10 @@
 import * as fs from "fs";
 import { generateFromString } from "./generator/entity_generator.js";
 
-let schemas = ["schemas/schema.gql"];
+let schemas = [
+  "schemas/academic-qualification-level.gql",
+  "schemas/academic-qualification.gql",
+];
 
 schemas.forEach((src) => {
   console.log(`Generating files for ${src} ...`);

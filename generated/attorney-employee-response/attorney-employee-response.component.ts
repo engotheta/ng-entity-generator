@@ -9,12 +9,11 @@ import { FetchParameter } from '@common/services/fetch.service';
 import { ActionButton } from "@common/components/action-buttons/action-buttons.inteface";
 import { ContentsViewComponent } from "@common/components/contents-view/contents-view.component";
 
-import { TaskCategory } from "./task-category.interface";
-import { FIND_TASK_CATEGORY_BY_ID } from "./task-category.graphql";
-import { taskCategoryUpsertBtn, taskCategory$ } from "./task-category.form";
+import { AttorneyEmployeeResponse } from "./attorney-employee-response.interface";
+import { attorneyEmployeeResponseUpsertBtn, attorneyEmployeeResponse$ } from "./attorney-employee-response.form";
 
 @Component({
-  selector: 'app-task-category.',
+  selector: 'app-attorney-employee-response.',
   imports: [CommonModule, PageHeaderComponent, ContentsViewComponent ,ToObservablePipe],
   template: `
     <!--  -->
@@ -29,18 +28,18 @@ import { taskCategoryUpsertBtn, taskCategory$ } from "./task-category.form";
     </div>
    `
 })
-export class TaskCategoryComponent extends BaseComponent  {
-  override title = 'Task Category';
-  override subtitle = 'Task Category Management';
-  override actionButtons: ActionButton[] = [taskCategoryUpsertBtn(this)];
+export class AttorneyEmployeeResponseComponent extends BaseComponent  {
+  override title = 'Attorney Employee Response';
+  override subtitle = 'Attorney Employee Response Management';
+  override actionButtons: ActionButton[] = [attorneyEmployeeResponseUpsertBtn(this)];
 
   fetchParameter: FetchParameter = {
     loadingOn: 'no-content',
-    query: FIND_TASK_CATEGORY_BY_ID,
-    refetchActions: [taskCategory$],
-    data$: new BehaviorSubject<TaskCategory | undefined>(undefined),
-    successFn:(res) => this.title = res?.data?.name,
-    variables: { id:this.route.snapshot?.paramMap?.get('taskCategoryUid')},
+    query: undefined,
+    refetchActions: [attorneyEmployeeResponse$],
+    data$: new BehaviorSubject<AttorneyEmployeeResponse | undefined>(undefined),
+    successFn:(res) => this.title = res?.data?.departmentName,
+    variables: { uid:this.route.snapshot?.paramMap?.get('attorneyEmployeeResponseUid')},
   };
 
   override contents:ContentParameter[] = [

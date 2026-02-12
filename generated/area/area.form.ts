@@ -10,13 +10,13 @@ import { VALIDATOR_REQUIRED } from '@common/components/generic-form/form-constan
 import { FieldConfig, FieldType } from '@common/components/generic-form/field.interface';
 import { ActionButton } from '@common/components/action-buttons/action-buttons.inteface';
 
-import { CREATE_OR_UPDATE_TASK_CATEGORY, DELETE_TASK_CATEGORY } from './task-category.graphql';
-import { TaskCategory } from './task-category.interface';
+import { CREATE_AREA, REMOVE_AREA_FROM_TASK } from './area.graphql';
+import { Area } from './area.interface';
 
-//Listener for all TaskCategory actions 
-export const taskCategory$ = new Subject<TaskCategory | any>();
+//Listener for all Area actions 
+export const area$ = new Subject<Area | any>();
 
-export const getTaskCategoryFormFields = (comp: BaseComponent): FieldConfig[] => [
+export const getAreaFormFields = (comp: BaseComponent): FieldConfig[] => [
   {
     key: "code",
     type: FieldType.input,
@@ -25,7 +25,7 @@ export const getTaskCategoryFormFields = (comp: BaseComponent): FieldConfig[] =>
   {
     key: "description",
     type: FieldType.textarea,
-    validations: [],
+    validations: [VALIDATOR_REQUIRED],
     class: "col-span-full",
   },
   {
@@ -41,21 +41,21 @@ export const getTaskCategoryFormFields = (comp: BaseComponent): FieldConfig[] =>
   },
 ];
 
-export function taskCategoryUpsertBtn(comp: BaseComponent):ActionButton {
+export function areaUpsertBtn(comp: BaseComponent):ActionButton {
   return {
-    click: (data?: TaskCategory) => {
+    click: (data?: Area) => {
       const formParameter: FormParameters = {
         model: data,
-        title: 'Task Category',
-        fields: getTaskCategoryFormFields(comp),
-        closeAction$: taskCategory$,
+        title: 'Area',
+        fields: getAreaFormFields(comp),
+        closeAction$: area$,
 
         onSubmit: async (data: any) => {
           await comp.fs.fetch({
             notify: true,
-            variables: { request:data},
-            mutation: CREATE_OR_UPDATE_TASK_CATEGORY,
-            successFn: (res) => taskCategory$.next(res?.data),
+            variables: { ent:data},
+            mutation: CREATE_AREA,
+            successFn: (res) => area$.next(res?.data),
           });
         },
       };
@@ -63,44 +63,44 @@ export function taskCategoryUpsertBtn(comp: BaseComponent):ActionButton {
       comp.vs?.openModal(FormComponent, formParameter, '96%', '720px');
     },
     permissions: [],
-    ...getUpsertBtnProps('Task Category','uuid'),
+    ...getUpsertBtnProps('Area','uuid'),
   };
 }
 
-export function taskCategoryViewBtn(comp: BaseComponent):ActionButton {
+export function areaViewBtn(comp: BaseComponent):ActionButton {
   return {
     icon: 'view',
-    label: 'View Task Category',
-    click: (data: TaskCategory) => navigateRelativeTo(comp, 'task-categories', data?.uuid),
+    label: 'View Area',
+    click: (data: Area) => navigateRelativeTo(comp, 'areas', data?.uuid),
     permissions: [],
   };
 }
 
- export function taskCategoryDeleteBtn(comp: BaseComponent):ActionButton {
+ export function areaDeleteBtn(comp: BaseComponent):ActionButton {
   return {
 
-    click: async (data: TaskCategory) => {
+    click: async (data: Area) => {
       await comp.fs.fetch({
         notify: true,
         loadingOn: 'content',
-        variables: {id:data.uuid},
-        mutation: DELETE_TASK_CATEGORY,
-        finalFn: (res) => taskCategory$.next(res?.data),
+        variables: {uuid:data.uuid},
+        mutation: REMOVE_AREA_FROM_TASK,
+        finalFn: (res) => area$.next(res?.data),
       });
     },
-    ...getDeleteBtnProps('Task Category', 'name'),
+    ...getDeleteBtnProps('Area', 'name'),
     permissions: [],
   };
 }
 
-export function taskCategoryTableBtns(comp: BaseComponent):ActionButton[] {
+export function areaTableBtns(comp: BaseComponent):ActionButton[] {
   return  [
     {
       ...MORE_BTN,
       buttons: [
-        taskCategoryViewBtn(comp),
-        taskCategoryUpsertBtn(comp),
-        taskCategoryDeleteBtn(comp),
+        areaViewBtn(comp),
+        areaUpsertBtn(comp),
+        areaDeleteBtn(comp),
       ],
     },
   ];

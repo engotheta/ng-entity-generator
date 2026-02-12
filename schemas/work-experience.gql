@@ -1,0 +1,65 @@
+Mutation.deleteWorkExperience(
+id: UUID
+): Response_WorkExperience
+Mutation.changeWorkExperienceStatus(
+id: UUID
+): Response_WorkExperience
+Mutation.createWorkExperience(
+ent: WorkExperienceRequestInput
+): Response_WorkExperience
+Query.findWorkExperienceById(
+id: UUID
+): Response_WorkExperience
+Query.searchWorkExperience(
+filter: WorkExperienceFilterInput
+pagination: PaginationInput
+): Response_Page_WorkExperienceResponse
+
+type WorkExperience {
+active: Boolean!
+attorney: Attorney!
+createdAt: LocalDateTime
+createdBy: Long
+currentlyWorkingHere: Boolean!
+deleted: Boolean!
+deletedAt: LocalDateTime
+endDate: LocalDate
+institutionName: String!
+position: String!
+startDate: LocalDate!
+uid: UUID
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type WorkExperienceFilterInput {
+active: Boolean
+attorney: UUID
+id: Long
+uid: UUID
+}
+
+type WorkExperienceRequestInput {
+attorney: UUID!
+currentlyWorkingHere: Boolean!
+endDate: LocalDate
+id: UUID
+institutionName: String!
+position: String!
+responsibilities: [UUID]!
+startDate: LocalDate!
+}
+
+type WorkExperienceResponse {
+active: Boolean
+areas: [WorkingExperienceAreaResponse]
+attorney: String
+attorneyId: UUID
+currentlyWorkingHere: Boolean
+endDate: LocalDate
+institutionName: String
+position: String
+responsibilities: String
+startDate: LocalDate
+uuid: UUID
+}

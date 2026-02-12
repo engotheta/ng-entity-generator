@@ -5,12 +5,12 @@ import { DataGridComponent } from '@common/components/data-grid/data-grid.compon
 import { ActionButton } from '@common/components/action-buttons/action-buttons.inteface';
 import { GridParameter, GridKeyColumn } from '@common/components/data-grid/data-grid.interfaces';
 
-import { GET_ALL_TASK_CATEGORIES } from './task-category.graphql';
-import { taskCategoryUpsertBtn } from './task-category.form';
-import { taskCategoryTableBtns, taskCategory$ } from './task-category.form';
+import { CHANGE_AREA_STATUS } from './area.graphql';
+import { areaUpsertBtn } from './area.form';
+import { areaTableBtns, area$ } from './area.form';
 
 @Component({
-  selector: 'app-task-categories',
+  selector: 'app-areas',
   imports: [DataGridComponent, PageHeaderComponent],
   template: ` 
     <div class="flex-1 flex flex-col gap-3 ">
@@ -19,20 +19,20 @@ import { taskCategoryTableBtns, taskCategory$ } from './task-category.form';
     </div>
   `,
 })
-export class TaskCategoriesComponent extends BaseComponent {
-  override title: string = 'Task Categories Management';
-  override subtitle: string = 'Task Categories List';
-  override actionButtons: ActionButton[] = [taskCategoryUpsertBtn(this)];
+export class AreasComponent extends BaseComponent {
+  override title: string = 'Areas Management';
+  override subtitle: string = 'Areas List';
+  override actionButtons: ActionButton[] = [areaUpsertBtn(this)];
 
-  keyColumns: GridKeyColumn[] = ['index','name', 'code', 'description', 'actions'];
+  keyColumns: GridKeyColumn[] = ['name', 'code', 'description'];
 
   gridParameter: GridParameter = {
-     title: 'Task Categories',
+     title: 'Areas',
      icon: 'info_circle',
      keyColumns: this.keyColumns,
-     actionButtons: taskCategoryTableBtns(this),
-     reloadActions$: [taskCategory$],
-     fetchParameter: { query: GET_ALL_TASK_CATEGORIES },
+     actionButtons: areaTableBtns(this),
+     reloadActions$: [area$],
+     fetchParameter: { query: CHANGE_AREA_STATUS },
    };
 
 }

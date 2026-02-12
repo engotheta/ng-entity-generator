@@ -1,0 +1,81 @@
+Mutation.deleteAcademicQualification(
+id: UUID
+): Response_AcademicQualification
+
+Mutation.changeAcademicQualificationStatus(
+id: UUID
+): Response_AcademicQualification
+
+Mutation.createAcademicQualification(
+ent: AcademicQualificationRequestInput
+): Response_AcademicQualification
+
+Query.searchAcademicQualification(
+filter: AcademicQualificationFilterInput
+pagination: PaginationInput
+): Response_Page_AcademicQualificationResponse
+
+Query.findAcademicQualificationById(
+id: UUID
+): Response_AcademicQualification
+
+type AcademicQualification {
+active: Boolean!
+county: Country!
+createdAt: LocalDateTime
+createdBy: Long
+deleted: Boolean!
+deletedAt: LocalDateTime
+institution: String!
+level: AcademicQualificationsLevel!
+programName: String!
+receivedBy: Attorney!
+uid: UUID
+updatedAt: LocalDateTime
+updatedBy: Long
+yearObtained: Long!
+}
+
+type AcademicQualificationFilterInput {
+active: Boolean
+attorney: UUID
+country: UUID
+id: Long
+level: UUID
+uid: UUID
+}
+
+type AcademicQualificationAreaResponse {
+academicQualificationId: UUID
+area: String
+areaId: UUID
+}
+ 
+
+ type AcademicQualificationRequestInput {
+areaIds: [UUID]!
+attorney: UUID!
+country: UUID!
+id: UUID
+institution: String!
+level: UUID!
+programName: String!
+yearObtained: Long!
+}
+
+type AcademicQualificationResponse {
+active: Boolean
+areas: [AcademicQualificationAreaResponse]
+attorney: String
+attorneyId: UUID
+country: String
+countryId: UUID
+institution: String
+level: String
+levelId: UUID
+programName: String
+uuid: UUID
+yearObtained: Long
+}
+
+ 

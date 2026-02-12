@@ -11,6 +11,9 @@ export interface TaskCategory {
   code: string;
   description?: string;
   name: string;
+  createdAt?: string;
+  updatedAt?: string;
+  uuid?: string;
 }
 
 export interface TaskCategoryFilterInput {
@@ -19,15 +22,5 @@ export interface TaskCategoryFilterInput {
   id?: number;
   name?: string;
   uid?: string;
-}
-
-export interface TaskCategoryResponse {
-  active?: boolean;
-  code?: string;
-  createdAt?: string;
-  description?: string;
-  name?: string;
-  updatedAt?: string;
-  uuid?: string;
 }
 

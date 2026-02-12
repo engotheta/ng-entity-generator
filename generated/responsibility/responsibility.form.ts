@@ -10,22 +10,22 @@ import { VALIDATOR_REQUIRED } from '@common/components/generic-form/form-constan
 import { FieldConfig, FieldType } from '@common/components/generic-form/field.interface';
 import { ActionButton } from '@common/components/action-buttons/action-buttons.inteface';
 
-import { CREATE_OR_UPDATE_TASK_CATEGORY, DELETE_TASK_CATEGORY } from './task-category.graphql';
-import { TaskCategory } from './task-category.interface';
+import { CREATE_RESPONSIBILITY, DELETE_RESPONSIBILITY } from './responsibility.graphql';
+import { Responsibility } from './responsibility.interface';
 
-//Listener for all TaskCategory actions 
-export const taskCategory$ = new Subject<TaskCategory | any>();
+//Listener for all Responsibility actions 
+export const responsibility$ = new Subject<Responsibility | any>();
 
-export const getTaskCategoryFormFields = (comp: BaseComponent): FieldConfig[] => [
+export const getResponsibilityFormFields = (comp: BaseComponent): FieldConfig[] => [
   {
-    key: "code",
+    key: "areaIds",
     type: FieldType.input,
     validations: [VALIDATOR_REQUIRED],
   },
   {
     key: "description",
     type: FieldType.textarea,
-    validations: [],
+    validations: [VALIDATOR_REQUIRED],
     class: "col-span-full",
   },
   {
@@ -41,21 +41,21 @@ export const getTaskCategoryFormFields = (comp: BaseComponent): FieldConfig[] =>
   },
 ];
 
-export function taskCategoryUpsertBtn(comp: BaseComponent):ActionButton {
+export function responsibilityUpsertBtn(comp: BaseComponent):ActionButton {
   return {
-    click: (data?: TaskCategory) => {
+    click: (data?: Responsibility) => {
       const formParameter: FormParameters = {
         model: data,
-        title: 'Task Category',
-        fields: getTaskCategoryFormFields(comp),
-        closeAction$: taskCategory$,
+        title: 'Responsibility',
+        fields: getResponsibilityFormFields(comp),
+        closeAction$: responsibility$,
 
         onSubmit: async (data: any) => {
           await comp.fs.fetch({
             notify: true,
-            variables: { request:data},
-            mutation: CREATE_OR_UPDATE_TASK_CATEGORY,
-            successFn: (res) => taskCategory$.next(res?.data),
+            variables: { ent:data},
+            mutation: CREATE_RESPONSIBILITY,
+            successFn: (res) => responsibility$.next(res?.data),
           });
         },
       };
@@ -63,44 +63,44 @@ export function taskCategoryUpsertBtn(comp: BaseComponent):ActionButton {
       comp.vs?.openModal(FormComponent, formParameter, '96%', '720px');
     },
     permissions: [],
-    ...getUpsertBtnProps('Task Category','uuid'),
+    ...getUpsertBtnProps('Responsibility','uuid'),
   };
 }
 
-export function taskCategoryViewBtn(comp: BaseComponent):ActionButton {
+export function responsibilityViewBtn(comp: BaseComponent):ActionButton {
   return {
     icon: 'view',
-    label: 'View Task Category',
-    click: (data: TaskCategory) => navigateRelativeTo(comp, 'task-categories', data?.uuid),
+    label: 'View Responsibility',
+    click: (data: Responsibility) => navigateRelativeTo(comp, 'responsibilities', data?.uuid),
     permissions: [],
   };
 }
 
- export function taskCategoryDeleteBtn(comp: BaseComponent):ActionButton {
+ export function responsibilityDeleteBtn(comp: BaseComponent):ActionButton {
   return {
 
-    click: async (data: TaskCategory) => {
+    click: async (data: Responsibility) => {
       await comp.fs.fetch({
         notify: true,
         loadingOn: 'content',
         variables: {id:data.uuid},
-        mutation: DELETE_TASK_CATEGORY,
-        finalFn: (res) => taskCategory$.next(res?.data),
+        mutation: DELETE_RESPONSIBILITY,
+        finalFn: (res) => responsibility$.next(res?.data),
       });
     },
-    ...getDeleteBtnProps('Task Category', 'name'),
+    ...getDeleteBtnProps('Responsibility', 'name'),
     permissions: [],
   };
 }
 
-export function taskCategoryTableBtns(comp: BaseComponent):ActionButton[] {
+export function responsibilityTableBtns(comp: BaseComponent):ActionButton[] {
   return  [
     {
       ...MORE_BTN,
       buttons: [
-        taskCategoryViewBtn(comp),
-        taskCategoryUpsertBtn(comp),
-        taskCategoryDeleteBtn(comp),
+        responsibilityViewBtn(comp),
+        responsibilityUpsertBtn(comp),
+        responsibilityDeleteBtn(comp),
       ],
     },
   ];

@@ -9,12 +9,12 @@ import { FetchParameter } from '@common/services/fetch.service';
 import { ActionButton } from "@common/components/action-buttons/action-buttons.inteface";
 import { ContentsViewComponent } from "@common/components/contents-view/contents-view.component";
 
-import { TaskCategory } from "./task-category.interface";
-import { FIND_TASK_CATEGORY_BY_ID } from "./task-category.graphql";
-import { taskCategoryUpsertBtn, taskCategory$ } from "./task-category.form";
+import { AcademicQualification } from "./academic-qualification.interface";
+import { FIND_ACADEMIC_QUALIFICATION_BY_ID } from "./academic-qualification.graphql";
+import { academicQualificationUpsertBtn, academicQualification$ } from "./academic-qualification.form";
 
 @Component({
-  selector: 'app-task-category.',
+  selector: 'app-academic-qualification.',
   imports: [CommonModule, PageHeaderComponent, ContentsViewComponent ,ToObservablePipe],
   template: `
     <!--  -->
@@ -29,18 +29,18 @@ import { taskCategoryUpsertBtn, taskCategory$ } from "./task-category.form";
     </div>
    `
 })
-export class TaskCategoryComponent extends BaseComponent  {
-  override title = 'Task Category';
-  override subtitle = 'Task Category Management';
-  override actionButtons: ActionButton[] = [taskCategoryUpsertBtn(this)];
+export class AcademicQualificationComponent extends BaseComponent  {
+  override title = 'Academic Qualification';
+  override subtitle = 'Academic Qualification Management';
+  override actionButtons: ActionButton[] = [academicQualificationUpsertBtn(this)];
 
   fetchParameter: FetchParameter = {
     loadingOn: 'no-content',
-    query: FIND_TASK_CATEGORY_BY_ID,
-    refetchActions: [taskCategory$],
-    data$: new BehaviorSubject<TaskCategory | undefined>(undefined),
-    successFn:(res) => this.title = res?.data?.name,
-    variables: { id:this.route.snapshot?.paramMap?.get('taskCategoryUid')},
+    query: FIND_ACADEMIC_QUALIFICATION_BY_ID,
+    refetchActions: [academicQualification$],
+    data$: new BehaviorSubject<AcademicQualification | undefined>(undefined),
+    successFn:(res) => this.title = res?.data?.programName,
+    variables: { id:this.route.snapshot?.paramMap?.get('academicQualificationUid')},
   };
 
   override contents:ContentParameter[] = [

@@ -1,0 +1,139 @@
+Query.viewAttorneyCV(
+id: UUID
+): Response_AttorneyCv
+
+type AttorneyCv {
+academicQualifications: [AcademicQualificationResponse]
+attorney: String
+attorneyId: UUID
+checkNumber: String
+competencyAwards: [CompetencyResponse]
+email: String
+handledCases: [AttorneyCaseResponse]
+hireDate: LocalDate
+memberships: [MembershipMinimal]
+recategorizationDate: LocalDate
+rollNumber: String
+sex: String
+trainings: [TrainingMinimal]
+transfers: [AttorneyTransferResponse]
+workExperiences: [WorkExperienceResponse]
+}
+
+type AcademicQualificationResponse {
+active: Boolean
+areas: [AcademicQualificationAreaResponse]
+attorney: String
+attorneyId: UUID
+country: String
+countryId: UUID
+institution: String
+level: String
+levelId: UUID
+programName: String
+uuid: UUID
+yearObtained: Long
+}
+
+type AcademicQualificationAreaResponse {
+academicQualificationId: UUID
+area: String
+areaId: UUID
+}
+
+type CompetencyResponse {
+active: Boolean
+areas: [CompetencyAreaResponse]
+attorney: String
+attorneyId: UUID
+awardTitle: String
+awardedYear: Long
+awarder: String
+uuid: UUID
+}
+
+type CompetencyAreaResponse {
+area: String
+areaId: UUID
+competencyId: UUID
+}
+
+type AttorneyCaseResponse {
+amountClaimed: BigDecimal
+attorneyName: String
+attorneyUid: UUID
+caseBrief: String
+caseCategory: String
+caseCode: String
+caseNo: String
+caseType: String
+caseUid: UUID
+court: String
+filingDate: LocalDate
+id: Long
+referenceNo: String
+responsibilities: String
+role: String
+won: Boolean
+}
+
+type MembershipMinimal {
+active: Boolean
+currentlyMember: Boolean
+description: String
+endDate: LocalDate
+membershipTypeUuid: UUID
+name: String
+responsibilities: String
+role: String
+startDate: LocalDate
+type: String
+uuid: UUID
+}
+
+type TrainingMinimal {
+active: Boolean
+areas: [TrainingAreaResponse]
+attorneyId: UUID
+description: String
+trainedAt: LocalDateTime
+trainedBy: String
+trainedTopic: String
+uuid: UUID
+}
+
+type AttorneyTransferResponse {
+active: Boolean
+attorneyId: UUID
+institution: String
+institutionId: UUID
+joinedAt: LocalDateTime
+leftAt: LocalDateTime
+uuid: UUID
+}
+
+type WorkExperienceResponse {
+active: Boolean
+areas: [WorkingExperienceAreaResponse]
+attorney: String
+attorneyId: UUID
+currentlyWorkingHere: Boolean
+endDate: LocalDate
+institutionName: String
+position: String
+responsibilities: String
+startDate: LocalDate
+uuid: UUID
+}
+
+type WorkingExperienceAreaResponse {
+area: String
+areaId: UUID
+workingExperienceId: UUID
+}
+
+type TrainingAreaResponse {
+area: String
+areaId: UUID
+trainingId: UUID
+}

@@ -9,12 +9,11 @@ import { FetchParameter } from '@common/services/fetch.service';
 import { ActionButton } from "@common/components/action-buttons/action-buttons.inteface";
 import { ContentsViewComponent } from "@common/components/contents-view/contents-view.component";
 
-import { TaskCategory } from "./task-category.interface";
-import { FIND_TASK_CATEGORY_BY_ID } from "./task-category.graphql";
-import { taskCategoryUpsertBtn, taskCategory$ } from "./task-category.form";
+import { AttorneyEmployee } from "./attorney-employee.interface";
+import { attorneyEmployeeUpsertBtn, attorneyEmployee$ } from "./attorney-employee.form";
 
 @Component({
-  selector: 'app-task-category.',
+  selector: 'app-attorney-employee.',
   imports: [CommonModule, PageHeaderComponent, ContentsViewComponent ,ToObservablePipe],
   template: `
     <!--  -->
@@ -29,18 +28,18 @@ import { taskCategoryUpsertBtn, taskCategory$ } from "./task-category.form";
     </div>
    `
 })
-export class TaskCategoryComponent extends BaseComponent  {
-  override title = 'Task Category';
-  override subtitle = 'Task Category Management';
-  override actionButtons: ActionButton[] = [taskCategoryUpsertBtn(this)];
+export class AttorneyEmployeeComponent extends BaseComponent  {
+  override title = 'Attorney Employee';
+  override subtitle = 'Attorney Employee Management';
+  override actionButtons: ActionButton[] = [attorneyEmployeeUpsertBtn(this)];
 
   fetchParameter: FetchParameter = {
     loadingOn: 'no-content',
-    query: FIND_TASK_CATEGORY_BY_ID,
-    refetchActions: [taskCategory$],
-    data$: new BehaviorSubject<TaskCategory | undefined>(undefined),
-    successFn:(res) => this.title = res?.data?.name,
-    variables: { id:this.route.snapshot?.paramMap?.get('taskCategoryUid')},
+    query: undefined,
+    refetchActions: [attorneyEmployee$],
+    data$: new BehaviorSubject<AttorneyEmployee | undefined>(undefined),
+    successFn:(res) => this.title = res?.data?.departmentName,
+    variables: { uid:this.route.snapshot?.paramMap?.get('attorneyEmployeeUid')},
   };
 
   override contents:ContentParameter[] = [

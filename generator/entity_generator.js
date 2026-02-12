@@ -8,6 +8,8 @@ const path = require("path");
 const { analyzeStoreTypes } = require("./app_types.js");
 const { ALL } = require("dns");
 
+let ID_KEY = "uuid";
+
 class Field {
   constructor(name, type, nullable = true, required = false, isArray = false) {
     this.name = name;
@@ -168,7 +170,7 @@ class EntityGenerator {
     //prettier-ignore
     let type = types.find((t) =>  this.dtoSuffixes.some((s) => t.name === `${entityName}${s}`) );
     //prettier-ignore
-    if (!type && force) return this._getDtoType(types, `${entityName}${suffixes[0]}`, force);
+    if (!type && force) return this._getDtoType(types, `${entityName}${this.dtoSuffixes[0]}`, force);
     else return type
   }
 
@@ -273,6 +275,7 @@ class EntityGenerator {
     let queryPart = [
       `find${entityName}`,
       `get${entityName}By`,
+      `view${entityName}`,
       `${entityName}By`,
       `get${entityName}`,
     ];
@@ -313,20 +316,32 @@ class EntityGenerator {
       `all${entityPlural}`,
       `getAll${entityPlural}`,
       `get${entityPlural}`,
+      `search${entityName}`,
       `${entityPlural}`,
     ];
 
     //prettier-ignore
     let fOperations = operations?.filter((o) => {
-      let nameMatch = queryPart.some(x => o.name.toLowerCase().includes(x.toLowerCase()))
+       return queryPart.some(x => o.name.toLowerCase().includes(x.toLowerCase()))
 
-      let returnMatch = 
-        o.type === 'Query' &&
-        ['list', 'page' ].some(str => [str,entityName.toLowerCase() ]
-        .every( s =>  o.returnType.toLowerCase().includes(s)))
       
-      return nameMatch || returnMatch
+      
+     
     });
+
+    fOperations =
+      fOperations ??
+      operations?.filter((o) => {
+        let returnMatch =
+          o.type === "Query" &&
+          ["list", "page"].some((str) =>
+            [str, entityName.toLowerCase()].every((s) =>
+              o.returnType.toLowerCase().includes(s),
+            ),
+          );
+
+        return returnMatch;
+      });
 
     //prettier-ignore
     let fOperation = fOperations?.[0];
@@ -641,6 +656,7 @@ class EntityGenerator {
   }
 
   _getBusinessKeys(type, sort = true) {
+    if (!type) return [];
     let keys = type.fields.map((field) => field.name);
     keys = keys.filter((key) => this._isBusinessKey(key));
     if (sort) keys = this._sortByReference([...keys], this._getNameKeys(type));
@@ -690,19 +706,22 @@ class EntityGenerator {
       });
   }
 
+  GQL_TYPES = [
+    "String",
+    "Int",
+    "Float",
+    "Integer",
+    "Boolean",
+    "ID",
+    "LocalDate",
+    "LocalDateTime",
+    "BigDecimal",
+    "Long",
+    "UUID",
+  ];
+
   _isGqlType(type) {
-    const gqlScalars = new Set([
-      "String",
-      "Int",
-      "Float",
-      "Boolean",
-      "ID",
-      "LocalDate",
-      "LocalDateTime",
-      "BigDecimal",
-      "Long",
-      "UUID",
-    ]);
+    const gqlScalars = new Set(this.GQL_TYPES);
 
     return gqlScalars.has(type);
   }
@@ -713,14 +732,15 @@ class EntityGenerator {
   }
 
   generateInterfaceFile(entityName, types, includeNotInMain = true) {
+    let types_ = [...types];
     // prettier-ignore
-    if(!includeNotInMain) types = types.filter(t => t.name.includes(entityName))
+    if(!includeNotInMain) types_ = types_.filter(t => t.name.includes(entityName))
 
-    const mainType = types.find((t) => t.name === entityName);
-    const enums = types.filter((t) => t.isEnum);
-    const inputs = types.filter((t) => t.name.includes("Dto"));
+    const mainType = types_.find((t) => t.name === entityName);
+    const enums = types_.filter((t) => t.isEnum);
+    const inputs = types_.filter((t) => t.name.includes("Dto"));
     // prettier-ignore
-    const otherTypes = types.filter((t)=>  !t.name.includes('Dto') && !t.isEnum);
+    const otherTypes = types_.filter((t)=>  !t.name.includes('Dto') && !t.isEnum && !t.name.endsWith('Response'));
 
     let imports = "";
 
@@ -732,7 +752,7 @@ class EntityGenerator {
     let addField = (field) => {
       const tsType = this._graphqlToTsType(field.type);
       // prettier-ignore
-      if(!['string','number','boolean'].includes(tsType) && !types.find(t => t.name === tsType)) {
+      if(!['string','number','boolean'].includes(tsType) && !types_.find(t => t.name === tsType)) {
         let otherType =  ALL_TYPES.find(t => t.name === tsType);
         //remove the .ts part
         if(!!otherType && !imports.includes(tsType)){
@@ -740,7 +760,8 @@ class EntityGenerator {
         };
       }
       const optional = field.required ? "" : "?";
-      content += `  ${field.name}${optional}: ${tsType};\n`;
+      const tsType_ = field.isArray ? `${tsType}[]` : tsType;
+      content += `  ${field.name}${optional}: ${tsType_};\n`;
     };
 
     //
@@ -749,7 +770,16 @@ class EntityGenerator {
       content += `export interface ${type.name} {\n`;
 
       //put all no reserving basefields // if (!this.baseFields.includes(field.name))
-      for (const field of type.fields) addField(field);
+      let fields = type.fields;
+
+      //merge some types ie. typeResponseType etc
+      let typeRes = types_.find((t) => t.name === `${type.name}Response`);
+      if (!!typeRes) {
+        //prettier-ignore
+        typeRes.fields.forEach(f => !fields.find(f_ => f_.name === f.name) && fields.push(f))
+      }
+
+      for (const field of fields) addField(field);
 
       content += "}\n\n";
     });
@@ -782,23 +812,40 @@ class EntityGenerator {
   generateGraphqlFile(entityName, operations, types) {
     const camelName = this._toCamelCase(entityName);
 
-    const allReturnTypes = [
+    let allReturnTypes = [
       ...new Set(
         operations.map(
           (o) =>
             `${o.returnType
               .replace("Response_", "")
+              .replace("Page_", "")
               .replace("[", "")
               .replace("]", "")}=${o.returnType}`,
         ),
       ),
     ];
 
+    // ignore types
+
     // sort longer to shorter
-    allReturnTypes.sort((a, b) => b.length - a.length);
+    allReturnTypes = allReturnTypes
+      .sort((a, b) => b.length - a.length)
+
+      .filter(
+        (r) =>
+          !this.GQL_TYPES.some(
+            (t) => t.toLowerCase() === r.split("=")?.[0]?.toLowerCase(),
+          ),
+      )
+      .filter(
+        (r) =>
+          !["page_"].some((t) =>
+            r.split("=")?.[0]?.toLowerCase()?.startsWith(t.toLowerCase()),
+          ),
+      );
 
     //prettier-ignore
-    console.log("--------------------Return Typers-------------------", allReturnTypes );
+    // console.log("--------------------Return Typers-------------------", allReturnTypes );
 
     let imports = `import { baseGqlFields } from '@common/utilities/data.gql';\n`;
     imports += `import { gql } from '@apollo/client/core';\n`;
@@ -808,20 +855,28 @@ class EntityGenerator {
 
     // Generate all Types seen in return type field list
 
+    let initiatedTypes = [];
+
     for (const returnType of allReturnTypes) {
       const entityName_ = returnType.split("=")[0];
       const type_ = types.find((t) => t.name === entityName_);
+
       const camelName_ = this._toCamelCase(entityName_);
+
       //prettier-ignore
       // .filter((f) => !this.baseFields.includes(f.name)) // put the whole fields
       const fields = type_ ? type_.fields : [];
 
-      content += `export const ${camelName_}GqlFields = \`\n`;
+      if (fields.length) {
+        initiatedTypes.push(returnType);
 
-      for (const field of fields) {
-        //prettier-ignore
-        if (this._isGqlType(field.type) || field.isEnum)  content += `  ${field.name}\n`;
+        content += `export const ${camelName_}GqlFields = \`\n`;
+
+        for (const field of fields) {
+          //prettier-ignore
+          if (this._isGqlType(field.type) || field.isEnum)  content += `  ${field.name}\n`;
         else {
+          
           //prettier-ignore
           let fieldType = types.find((t) => t.name === field.type) ??  ALL_TYPES.find((t) => t.name === field.type);
           let primitives = ["string", "boolean", "number",'UUID'];
@@ -846,10 +901,11 @@ class EntityGenerator {
           }
     
         }
-      }
+        }
 
-      // content += "  ${baseGqlFields}\n"; // avaoid put base
-      content += "`;\n\n";
+        // content += "  ${baseGqlFields}\n"; // avaoid put base
+        content += "`;\n\n";
+      }
     }
 
     //
@@ -893,8 +949,9 @@ class EntityGenerator {
 
       //set return type
       //prettier-ignore
-      const entityName_ = allReturnTypes.find(a => op.returnType === a.split('=')[1] )?.split('=')?.[0];
-      const camelName_ = this._toCamelCase(entityName_) ?? camelName;
+      const entityName_ = initiatedTypes.find(a => op.returnType === a.split('=')[1] )?.split('=')?.[0];
+
+      const camelName_ = this._toCamelCase(entityName_ ?? entityName);
 
       //prettier-ignore
       if (op.returnType.includes("Page")) content += `      \${pageGqlFields(${camelName_}GqlFields)}\n`;
@@ -971,7 +1028,7 @@ class EntityGenerator {
     content += "\n";
 
     //prettier-ignore
-    content += `  keyColumns: GridKeyColumn[] = [${businessKeys.slice(0,6).map(k => "'"+k+"'").join(', ')}];\n`;
+    content += `  keyColumns: GridKeyColumn[] = ['index',${businessKeys.slice(0,6).map(k => "'"+k+"'").join(', ')}, 'actions'];\n`;
     content += "\n";
 
     content += `  gridParameter: GridParameter = {\n`;
@@ -1011,7 +1068,7 @@ class EntityGenerator {
     let content = "";
 
     imports += `import { Subject } from 'rxjs';\n`;
-    imports += `import { MORE_BTN } from '@common/table/data-grid-constants';\n`;
+    imports += `import { MORE_BTN } from '@common/components/data-grid/data-grid.constants';\n`;
     imports += `import { FormComponent } from '@common/components/generic-form/form.component';\n`;
     imports += `import { FormParameters } from '@common/components/generic-form/form.interface';\n`;
     imports += `import { BaseComponent } from '@common/components/base-componet/base-component';\n`;
@@ -1040,50 +1097,42 @@ class EntityGenerator {
     content += `];\n`;
     content += `\n`;
 
-    content += ` export async function open${entityName}Form(comp: BaseComponent, ${camelName}?: any) {\n`;
-    content += `  const formParameter: FormParameters = {\n`;
-    content += `    model: ${camelName},\n`;
-    content += `    title: '${titleName}',\n`;
-    content += `    fields: get${entityName}FormFields(comp),\n`;
+    content += `export function ${camelName}UpsertBtn(comp: BaseComponent):ActionButton {\n`;
+    content += `  return {\n`;
+
+    content += `    click: (data?: ${entityName}) => {\n`;
+    content += `      const formParameter: FormParameters = {\n`;
+    content += `        model: {...data},\n`;
+    content += `        title: '${titleName}',\n`;
+    content += `        fields: get${entityName}FormFields(comp),\n`;
+    content += `        closeAction$: ${camelName}$,\n`;
     content += `\n`;
 
     let variables_ = `${createOperation?.params?.map((p) => `${p.name}:data`).join(", ")}`;
 
-    content += `    onSubmit: async (data: any) => {\n`;
-    content += `      await comp.fs.fetch({\n`;
-    content += `        notify: true,\n`;
-    content += `        variables: { ${variables_}},\n`;
-    content += `        mutation: ${createOperationName},\n`;
-    content += `        successFn: (res) => ${camelName}$.next(res?.data),\n`;
-    content += `      });\n`;
-    content += `   },\n`;
-    content += `  };\n`;
+    content += `        onSubmit: async (data: any) => {\n`;
+    content += `          await comp.fs.fetch({\n`;
+    content += `            notify: true,\n`;
+    content += `            variables: { ${variables_}},\n`;
+    content += `            mutation: ${createOperationName},\n`;
+    content += `            successFn: (res) => ${camelName}$.next(res?.data),\n`;
+    content += `          });\n`;
+    content += `        },\n`;
+    content += `      };\n`;
     content += `\n`;
-
-    content += `  comp.vs?.openDialog({\n`;
-    content += `    width: '96%',\n`;
-    content += `    maxWidth: '720px',\n`;
-    content += `    data: formParameter,\n`;
-    content += `    component: FormComponent,\n`;
-    content += `    closeAction$: ${camelName}$,\n`;
-    content += `   });\n`;
-    content += ` }\n`;
+    content += `      comp.vs?.openModal(FormComponent, formParameter, '96%', '720px');\n`;
+    content += `    },\n`;
+    content += `    permissions: [],\n`;
+    content += `    ...getUpsertBtnProps('${titleName}','${ID_KEY}'),\n`;
+    content += `  };\n`;
+    content += `}\n`;
     content += `\n`;
 
     content += `export function ${camelName}ViewBtn(comp: BaseComponent):ActionButton {\n`;
     content += `  return {\n`;
     content += `    icon: 'view',\n`;
     content += `    label: 'View ${titleName}',\n`;
-    content += `    click: (data: ${entityName}) => navigateRelativeTo(comp, '${kebabPlural}', data?.uid),\n`;
-    content += `    permissions: [],\n`;
-    content += `  };\n`;
-    content += `}\n`;
-    content += `\n`;
-
-    content += `export function ${camelName}UpsertBtn(comp: BaseComponent):ActionButton {\n`;
-    content += `  return {\n`;
-    content += `    ...getUpsertBtnProps('${titleName}'),\n`;
-    content += `    click: (data?: ${entityName}) => open${entityName}Form(comp, data),\n`;
+    content += `    click: (data: ${entityName}) => navigateRelativeTo(comp, '${kebabPlural}', data?.${ID_KEY}),\n`;
     content += `    permissions: [],\n`;
     content += `  };\n`;
     content += `}\n`;
@@ -1095,23 +1144,25 @@ class EntityGenerator {
 
     content += ` export function ${camelName}DeleteBtn(comp: BaseComponent):ActionButton {\n`;
     content += `  return {\n`;
-    content += `    ...getDeleteBtnProps('${titleName}', '${nameKeys[0] ?? "name"}'),\n`;
-    content += `    permissions: [],\n`;
+
     content += `\n`;
 
     let variables = deleteOperation?.params
-      ?.map((p) => `${p.name}:data.uid`)
+      ?.map((p) => `${p.name}:data.${ID_KEY}`)
       .join(", ");
 
+    let varsProps = !!deleteOperation ? variables : `${ID_KEY}: data.${ID_KEY}`;
     content += `    click: async (data: ${entityName}) => {\n`;
     content += `      await comp.fs.fetch({\n`;
     content += `        notify: true,\n`;
     content += `        loadingOn: 'content',\n`;
-    content += `        variables: { ${!!deleteOperation ? variables : "uid: 'data.uid'"}},\n`;
+    content += `        variables: {${varsProps}},\n`;
     content += `        mutation: ${deleteOperationName},\n`;
     content += `        finalFn: (res) => ${camelName}$.next(res?.data),\n`;
     content += `      });\n`;
     content += `    },\n`;
+    content += `    ...getDeleteBtnProps('${titleName}', '${nameKeys[0] ?? "name"}'),\n`;
+    content += `    permissions: [],\n`;
     content += `  };\n`;
     content += `}\n`;
     content += `\n`;
@@ -1270,6 +1321,7 @@ class EntityGenerator {
     if (!arrayFields.length)   imports += `import { ToObservablePipe } from '@common/pipes/to-observable.pipe';\n`;
     imports += `import { BaseComponent } from "@common/components/base-componet/base-component";\n`;
     imports += `import { ContentParameter } from "@common/components/contents-view/view.interface";\n`;
+    imports += `import { FetchParameter } from '@common/services/fetch.service';\n`;
     imports += `import { ActionButton } from "@common/components/action-buttons/action-buttons.inteface";\n`;
     imports += `import { ContentsViewComponent } from "@common/components/contents-view/contents-view.component";\n`;
 
@@ -1326,11 +1378,12 @@ class EntityGenerator {
     content += `    query: ${findOperationName},\n`;
 
     //prettier-ignore
-    if (!arrayFields.length)  content += `    refetchActions: [${camelName}$],\n`;
-
-    content += `    data$: new BehaviorSubject<${entityName}>(),\n`;
+    if (!arrayFields.length){
+      content += `    refetchActions: [${camelName}$],\n`; 
+      content += `    data$: new BehaviorSubject<${entityName} | undefined>(undefined),\n`;
+    }
     content += `    successFn:(res) => this.title = res?.data?.${nameKeys?.[0] ?? "name"},\n`;
-    content += `    variables: { ${!!findOperation ? variables : "{uid:" + uid + "}"}},\n`;
+    content += `    variables: { ${!!findOperation ? variables : "uid:" + uid}},\n`;
     content += `  };\n`;
     content += `\n`;
 
@@ -1367,7 +1420,7 @@ class EntityGenerator {
     let imports = "";
 
     if (arrayFields.length) content += `    this.contents = [\n`;
-    else content += `    override contents:ContentParameter = [\n`;
+    else content += `    override contents:ContentParameter[] = [\n`;
 
     content += `      {\n`;
     content += `        type: 'details',\n`;
@@ -1391,7 +1444,6 @@ class EntityGenerator {
 
   getEntityChildrenContents(entityName, mainType, arrayFields) {
     const camelName = this._toCamelCase(entityName);
-    const businessKeys = this._getBusinessKeys(mainType);
 
     if (!arrayFields.length) return "";
     let content = "";
@@ -1427,6 +1479,10 @@ class EntityGenerator {
       // let childVariables = findOperation?.params?.map((p) => `${p.name}:${uid}`).join(", ");
       let childDefaultVar = `uid:${uid}`;
 
+      // console.log("----------child-------------------", childTypeDetails);
+
+      const businessKeys = this._getBusinessKeys(childTypeDetails);
+
       content += `          {\n`;
       content += `            type: "table",\n`;
       content += `            slug: "${childKebab}",\n`;
@@ -1438,7 +1494,7 @@ class EntityGenerator {
       // content += `            actionButtons: ${childCamel}TableBtns(this),\n`;
       // content += `            reloadActions$: [${childCamel}$],\n`;
       // content += `            fetchParameter: { query: ${childListOpName}, variables:{${childVariables ? variables : childDefaultVar}} },\n`;
-      content += `            gridData: this.${camelName}.${field.name},\n`;
+      content += `            gridData: this.${camelName}?.${field.name} ?? [],\n`;
       content += `          },\n`;
     });
 
@@ -1478,16 +1534,16 @@ class EntityGenerator {
       })),
     }));
 
+    ALL_TYPES = [...modTypes, ...ALL_TYPES];
+
     //prettier-ignore
-    console.log( "*****************************", entityName, "*******************************" );
+    console.log( "*****************************",  entityName,  "*******************************",  );
 
     const kebabName = this._toKebab(entityName);
     const kebabPlural = this._toPlural(kebabName);
     const entityDir = path.join(outputDir, `${kebabName}`);
 
     const entityFiles = {
-      //prettier-ignore
-      [`${kebabName}.interface.ts`]: this.generateInterfaceFile(entityName, modTypes),
       //prettier-ignore
       [`${kebabName}.graphql.ts`]: this.generateGraphqlFile( entityName, operations, modTypes ),
       //prettier-ignore
@@ -1496,6 +1552,8 @@ class EntityGenerator {
       [`${kebabName}.component.ts`]: this.generateEntityComp(entityName, operations, modTypes ),
       //prettier-ignore
       [`${kebabPlural}.component.ts`]: this.generateEntityListComp(entityName, operations, modTypes ),
+      //prettier-ignore
+      [`${kebabName}.interface.ts`]: this.generateInterfaceFile(entityName, modTypes),
     };
 
     const fileDirs = [{ dir: entityDir, files: entityFiles }];
