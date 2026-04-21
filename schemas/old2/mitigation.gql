@@ -1,0 +1,71 @@
+type Mitigation {
+active: Boolean!
+code: String!
+description: String!
+mitigations: Long
+mitigationsAt: LocalDate!
+mitigationsBy: Long!
+name: String!
+}
+
+type MitigationDtoInput {
+active: Boolean!
+code: String!
+description: String!
+mitigationsAt: LocalDate!
+mitigationsBy: Long!
+mitigationsUuid: UUID
+name: String!
+uuid: UUID
+}
+
+type MitigationResponse {
+active: Boolean
+code: String
+description: String
+id: Long
+mitigations: Long
+mitigationsAt: LocalDate
+mitigationsBy: Long
+name: String
+uuid: UUID
+}
+
+Mutation.changeMitigationStatus(
+uuid: UUID
+): Response_String
+
+Mutation.saveMitigation(
+input: MitigationDtoInput
+): Response_Mitigation
+
+Mutation.deleteMitigation(
+uuid: UUID
+): Response_String
+
+Mutation.removeMitigationFromRisk(
+mitigationUid: UUID
+riskUid: UUID
+): Response_Boolean
+
+Mutation.saveMitigationToRisk(
+input: MitigationDtoInput
+riskUid: UUID
+): Response_MitigationResponse
+
+Mutation.linkExistingMitigationToRisk(
+mitigationUid: UUID
+riskUid: UUID
+): Response_MitigationResponse
+
+Query.getMitigationsByRisk(
+riskUid: UUID
+): Response_List_MitigationResponse
+
+Query.searchMitigations(
+pageNumber: Int = 0
+pageSize: Int = 10
+term: String
+): Response_Page_MitigationResponse
+
+Query.findAllMitigations: [Mitigation]

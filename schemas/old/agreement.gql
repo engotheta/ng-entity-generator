@@ -1,0 +1,213 @@
+type Agreement {
+acceptedLinks: [AgreementAccepted]
+active: Boolean
+agreementActivity: [AgreementActivity]
+agreementAnalysed: [AgreementAnalysed]
+agreementChallenges: [AgreementChallenge]
+agreementClauses: [AgreementClause]
+agreementDescription: String
+agreementEndDate: OffsetDateTime
+agreementId: String
+agreementNumber: String
+agreementObligations: [AgreementObligation]
+agreementPrice: BigDecimal
+agreementProjects: [AgreementProject]
+agreementRights: [AgreementRight]
+agreementRisks: [AgreementRisk]
+agreementSignatories: [AgreementSignatory]
+agreementSites: [AgreementSite]
+agreementStartDate: OffsetDateTime
+agreementSubcategory: AgreementSubcategory
+agreementVettings: [AgreementVetting]
+closed: Boolean
+code: String
+commencementDate: OffsetDateTime
+contracts: [Contract]
+description: String
+draft: Boolean
+duration: BigDecimal
+effectiveDate: OffsetDateTime
+fixedPrice: Boolean
+implemented: Boolean
+institutionalApproved: Boolean
+name: String
+oagApproved: Boolean
+objectives: String
+purpose: String
+referenceNumber: String
+renewalDate: OffsetDateTime
+resubmission: Boolean
+signed: Boolean
+signingDate: OffsetDateTime
+summary: String
+terminated: Boolean
+titleOfTheAgreement: String
+vetted: Boolean
+}
+
+type AgreementDTO {
+active: Boolean
+agreementDescription: String
+agreementEndDate: OffsetDateTime
+agreementId: String
+agreementNumber: String
+agreementPrice: BigDecimal
+agreementStartDate: OffsetDateTime
+agreementSubcategoryUuid: UUID
+amendments: [AmendmentResponse]
+approvals: [ApprovalResponse]
+clauses: [AgreementClauseDTO]
+closed: Boolean
+code: String
+commencementDate: OffsetDateTime
+contracts: [ContractDTO]
+createdAt: LocalDateTime
+description: String
+disputes: [DisputeResponse]
+draft: Boolean
+duration: BigDecimal
+effectiveDate: OffsetDateTime
+fixedPrice: Boolean
+id: Long
+institutionLegalOpinions: [InstitutionLegalOpinionDTO]
+institutionalApproved: Boolean
+kpis: [AgreementKpiResponse]
+milestoneCompletionPercentage: Float
+milestones: [AgreementMilestoneResponse]
+name: String
+notifications: [NotificationResponse]
+oagApproved: Boolean
+oagLegalOpinions: [OagLegalOpinionDTO]
+objectives: String
+obligations: [AgreementObligationDTO]
+progressRecords: [AgreementProgressResponse]
+projects: [AgreementProjectDTO]
+purpose: String
+referenceNumber: String
+reminders: [ReminderResponse]
+renewalDate: OffsetDateTime
+resubmission: Boolean
+rights: [AgreementRightDTO]
+risks: [AgreementRiskDTO]
+signatories: [AgreementSignatoryDTO]
+signed: Boolean
+signingDate: OffsetDateTime
+subcategory: AgreementSubcategoryDTO
+summary: String
+terminated: Boolean
+terms: [AgreementTermResponse]
+titleOfTheAgreement: String
+updatedAt: LocalDateTime
+uuid: UUID
+vetted: Boolean
+vettings: [AgreementVettingDTO]
+witnesses: [AgreementWitnessDTO]
+}
+
+type CreateAgreementInputInput {
+agreementDescription: String
+agreementEndDate: OffsetDateTime
+agreementId: String
+agreementNumber: String
+agreementPrice: BigDecimal
+agreementStartDate: OffsetDateTime
+agreementSubcategoryUuid: UUID!
+code: String
+commencementDate: OffsetDateTime
+description: String
+duration: BigDecimal
+effectiveDate: OffsetDateTime
+fixedPrice: Boolean
+name: String!
+objectives: String
+purpose: String
+referenceNumber: String
+renewalDate: OffsetDateTime
+resubmission: Boolean
+signingDate: OffsetDateTime
+summary: String
+titleOfTheAgreement: String
+}
+
+
+type AgreementFilterInput {
+active: Boolean
+closed: Boolean
+direction: String
+draft: Boolean
+implementation: Boolean
+institutionalApproved: Boolean
+oagApproved: Boolean
+page: Int
+signed: Boolean
+size: Int
+sortBy: String
+status: Long
+subcategoryId: Long
+term: String
+terminated: Boolean
+vetted: Boolean
+}
+
+type UpdateAgreementInputInput {
+active: Boolean
+agreementDescription: String
+agreementEndDate: OffsetDateTime
+agreementId: String
+agreementNumber: String
+agreementPrice: BigDecimal
+agreementStartDate: OffsetDateTime
+agreementSubcategoryUuid: UUID
+code: String
+commencementDate: OffsetDateTime
+description: String
+duration: BigDecimal
+effectiveDate: OffsetDateTime
+fixedPrice: Boolean
+name: String
+objectives: String
+purpose: String
+referenceNumber: String
+renewalDate: OffsetDateTime
+resubmission: Boolean
+signingDate: OffsetDateTime
+summary: String
+titleOfTheAgreement: String
+}
+
+Mutation.createAgreement(
+input: CreateAgreementInputInput
+): Response_AgreementDTO
+
+Mutation.updateAgreement(
+input: UpdateAgreementInputInput
+uuid: UUID!
+): Response_AgreementDTO
+
+Query.searchAgreements(
+filter: AgreementFilterInput
+): Response_Page_AgreementDTO
+
+Query.draftAgreements: Response_List_AgreementDTO
+
+Query.agreements: Response_List_AgreementDTO
+
+Mutation.deleteAgreement(
+uuid: UUID!
+): Response_Boolean
+ 
+
+Query.agreementByUuid(
+uuid: UUID!
+): Response_AgreementDTO
+
+Query.agreementsBySubcategory(
+subcategoryId: Long!
+): Response_List_AgreementDTO
+ 
+Query.agreementsByAcceptedUuid(
+uuid: UUID
+): Response_List_Agreement
+ 
+
+ 

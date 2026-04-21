@@ -1,0 +1,58 @@
+
+type AgreementSectionsClauseSpecification{
+agreementSection: AgreementSectionDto
+agreementSectionUid: UUID
+clause: ClauseDto
+clauseUid: UUID
+createdAt: LocalDateTime
+createdBy: Long
+requiredData: String
+specification: String
+uid: UUID
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type AgreementSectionsClauseSpecificationRequestInput {
+agreementSectionUid: UUID!
+clauseUid: UUID!
+requiredData: String!
+specification: String!
+uid: UUID
+}
+
+Mutation.deleteSpecification(
+uuid: UUID
+): Response_Boolean
+
+Mutation.createSpecification(
+agmSectionClauseSpecRequest: AgreementSectionsClauseSpecificationRequestInput
+): Response_AgreementSectionsClauseSpecification
+
+Query.specificationCountByAgreementSection(
+agreementSectionUid: UUID
+): Response_Long
+
+Query.specificationCountByClause(
+clauseUid: UUID
+): Response_Long
+
+Query.specifications: [AgreementSectionsClauseSpecification]
+
+Query.specification(
+uuid: UUID
+): Response_AgreementSectionsClauseSpecification
+
+Query.searchSpecifications(
+size: Int = 10
+term: String
+page: Int = 0
+): Response_Page_AgreementSectionsClauseSpecification
+
+Query.specificationsByAgreementSection(
+agreementSectionUid: UUID
+): [AgreementSectionsClauseSpecification]
+
+Query.specificationsByClause(
+clauseUid: UUID
+): [AgreementSectionsClauseSpecification]

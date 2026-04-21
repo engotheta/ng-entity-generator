@@ -1,0 +1,109 @@
+type Clause {
+active: Boolean!
+agreementsClauses: [AgreementsClause]
+clauseNumber: String!
+clauseText: String!
+clauseTitle: String!
+code: String!
+description: String!
+isMandatory: Boolean!
+isNegotiable: Boolean!
+legalReference: String!
+name: String!
+riskLevel: String!
+}
+
+type ClauseDtoInput {
+active: Boolean!
+clauseNumber: String!
+clauseText: String!
+clauseTitle: String!
+code: String!
+description: String!
+isMandatory: Boolean!
+isNegotiable: Boolean!
+legalReference: String!
+name: String!
+riskLevel: String!
+uuid: UUID
+}
+
+type ClauseFilterInput {
+active: Boolean
+code: String
+isMandatory: Boolean
+name: String
+riskLevel: String
+}
+
+type ClauseResponse {
+active: Boolean
+clauseNumber: String
+clauseText: String
+clauseTitle: String
+code: String
+description: String
+id: Long
+isMandatory: Boolean
+isNegotiable: Boolean
+legalReference: String
+name: String
+riskLevel: String
+uuid: UUID
+}
+
+type AgreementsClause {
+agreement: Agreement!
+clause: Clause!
+id: Long
+}
+
+Mutation.deleteClause(
+uuid: UUID!
+): Response_Boolean
+
+
+Mutation.addClauseToAgreement(
+agreementUUid: UUID
+input: ClauseDtoInput
+): Response_ClauseDto
+
+
+Mutation.linkClauseToAgreement(
+agreementUuid: UUID
+clauseUuid: UUID
+): Response_String
+
+Mutation.createClause(
+input: ClauseDtoInput
+): Response_ClauseDto
+
+Mutation.updateClause(
+input: ClauseDtoInput
+): Response_ClauseDto
+
+Mutation.removeClauseFromAgreement(
+agreementUuid: UUID
+clauseUuid: UUID
+): Response_String
+
+Query.clauseByCode(
+code: String!
+): Response_ClauseDto
+
+Query.negotiableClauses: Response_List_ClauseResponse
+
+Query.getAgreementClause(
+agreementId: UUID
+): Response_List_ClauseResponse
+
+Query.clauseByUuid(
+uuid: UUID!
+): Response_ClauseDto
+
+Query.searchClauses(
+filter: ClauseFilterInput = {}
+pagination: PaginationInput
+): PageResponse_ClauseResponse
+
+Query.mandatoryClauses: Response_List_ClauseDto

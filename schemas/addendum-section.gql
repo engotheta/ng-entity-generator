@@ -1,0 +1,54 @@
+type AddendumSection {
+action: String
+hasClause: Boolean
+layoutSectionId: Long
+modificationNotes: String
+modifiedSectionTitle: String
+refAgreementSectionId: Long
+sectionTitle: String
+sequenceOrder: Int
+uuid: UUID
+}
+
+type AddendumSectionRequestInput {
+action: AddendumAction!
+addendumUid: UUID!
+hasClause: Boolean!
+layoutSectionUid: UUID!
+modificationNotes: String!
+modifiedSectionTitle: String
+refAgreementSectionUid: UUID
+sectionTitle: String
+sequenceOrder: Int
+uuid: UUID
+}
+
+Mutation.deleteAddendumSection(
+addendumSectionUid: UUID
+): Response_Void
+
+Mutation.restoreAddendumSection(
+addendumSectionUid: UUID
+): Response_Void
+
+Mutation.saveOrUpdateAddendumSection(
+input: AddendumSectionRequestInput
+): Response_AddendumSection
+
+Query.getAddendumSection(
+sectionUid: UUID
+): Response_AddendumSection
+
+Query.getSectionsByAddendumPaginated(
+addendumUid: UUID
+size: Int = 10
+page: Int = 0
+): Response_Page_AddendumSection
+
+Query.getSectionsByAddendum(
+addendumUid: UUID
+): Response_List_AddendumSection
+
+
+
+

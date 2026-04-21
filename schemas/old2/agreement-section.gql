@@ -1,0 +1,60 @@
+type AgreementSection {
+agreement: Agreement!
+layoutSection: LayoutSection!
+}
+
+type AgreementSection {
+agreementName: String
+agreementUid: UUID
+createdAt: LocalDateTime
+createdBy: Long
+layoutSectionName: String
+layoutSectionUid: UUID
+uid: UUID
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type AgreementSectionDtoInput {
+agreementName: String
+agreementUid: UUID
+createdAt: LocalDateTime
+createdBy: Long
+layoutSectionName: String
+layoutSectionUid: UUID
+uid: UUID
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+Mutation.createAgreementSection(
+sectionDto: AgreementSectionDtoInput
+): Response_AgreementSection
+
+Mutation.deleteAgreementSection(
+agreementSectionUid: UUID
+): Response_Boolean
+
+Mutation.deleteAllAgreementSectionsByAgreement(
+agreementUid: UUID
+): Response_Boolean
+
+Mutation.removeTemplateFromSection(
+agreementSectionUid: UUID
+): Response_Boolean
+
+Query.agreementSection(
+uid: UUID
+): Response_AgreementSection
+
+Query.agreementSectionsByAgreement(
+agreementUid: UUID
+): [AgreementSection]
+
+Query.agreementSectionsByAgreementPaginated(
+agreementUid: UUID
+page: PaginationInput = {pageNumber: 0, pageSize: 20, sort: {orders: []}}
+): Page_AgreementSection
+
+Query.agreementSections: [AgreementSection]
+

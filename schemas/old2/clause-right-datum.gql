@@ -1,0 +1,49 @@
+type ClauseRightsDatum {
+agreementSectionsClauseSpecification: AgreementSectionsClauseSpecification!
+endDate: LocalDate!
+frequency: ClauseRightFrequencyType
+id: Long
+numberOfDays: BigDecimal!
+right: Right!
+startDate: LocalDate!
+status: ClauseRightStatus
+uuid: UUID!
+}
+
+type ClauseRightsDatumDto {
+agreementSectionsClauseSpecificationUuid: UUID!
+endDate: LocalDate!
+frequency: ClauseRightFrequencyType!
+numberOfDays: BigDecimal!
+rightUuid: UUID!
+startDate: LocalDate!
+status: ClauseRightStatus
+uuid: UUID!
+}
+
+type ClauseRightsDatumDtoInput {
+agreementSectionsClauseSpecificationUuid: UUID!
+endDate: LocalDate!
+frequency: ClauseRightFrequencyType!
+numberOfDays: BigDecimal!
+rightUuid: UUID!
+startDate: LocalDate!
+status: ClauseRightStatus
+uuid: UUID!
+}
+
+Mutation.deleteClauseRightsDatum(
+uuid: UUID
+): Response_String
+
+Mutation.saveClauseRightsDatum(
+input: ClauseRightsDatumDtoInput
+): Response_ClauseRightsDatum
+
+Query.searchClauseRightsData(
+pageNumber: Int = 0
+pageSize: Int = 10
+term: String
+): Response_Page_ClauseRightsDatum
+
+Query.findAllClauseRightsData: [ClauseRightsDatum]

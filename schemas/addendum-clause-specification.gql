@@ -1,0 +1,36 @@
+type AddendumClauseSpec {
+createdAt: LocalDateTime
+refSpecificationId: Long
+requiredData: String
+specification: String
+updatedAt: LocalDateTime
+uuid: UUID
+}
+
+type AddendumClauseSpecRequestInput {
+addendumClauseUid: UUID!
+refSpecificationUid: UUID
+requiredData: String!
+specification: String!
+uuid: UUID
+}
+
+Mutation.restoreAddendumClauseSpecification(
+addendumClauseSpecUuid: UUID!
+): Response_Void
+
+Mutation.saveOrUpdateAddendumClauseSpecification(
+input: AddendumClauseSpecRequestInput!
+): Response_AddendumClauseSpec
+
+Mutation.softDeleteAddendumClauseSpecification(
+addendumClauseSpecUuid: UUID!
+): Response_Void
+
+Query.getAddendumClauseSpecificationsByClause(
+addendumClauseUid: UUID!
+): Response_List_AddendumClauseSpec
+
+Query.getAddendumClauseSpecificationsByUid(
+clauseSpecUid: UUID!
+): Response_AddendumClauseSpec

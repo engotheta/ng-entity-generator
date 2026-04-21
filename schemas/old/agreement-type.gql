@@ -1,0 +1,60 @@
+type AgreementType {
+active: Boolean
+code: String
+description: String
+name: String
+}
+
+type AgreementTypeDTO {
+active: Boolean
+code: String
+description: String
+name: String
+uuid: UUID
+}
+
+type AgreementTypeFilterInput {
+active: Boolean
+direction: String
+page: Int
+size: Int
+sortBy: String
+term: String
+}
+
+type CreateAgreementTypeInputInput {
+code: String
+description: String
+name: String!
+}
+
+type UpdateAgreementTypeInputInput {
+active: Boolean
+code: String
+description: String
+name: String
+}
+
+Mutation.updateAgreementType(
+input: UpdateAgreementTypeInputInput
+uuid: UUID!
+): Response_AgreementTypeDTO
+Mutation.createAgreementType(
+input: CreateAgreementTypeInputInput
+): Response_AgreementTypeDTO
+Mutation.deleteAgreementType(
+uuid: UUID!
+): Response_Boolean
+Query.searchAgreementTypes(
+filter: AgreementTypeFilterInput
+): Response_Page_AgreementTypeDTO
+Query.agreementTypeByUuid(
+uuid: UUID!
+): Response_AgreementTypeDTO
+Query.agreementCategoriesByType(
+agreementTypeId: Long!
+): Response_List_AgreementCategoryDTO
+Query.agreementTypeByCode(
+code: String!
+): Response_AgreementTypeDTO
+Query.agreementTypes: Response_List_AgreementTypeDTO

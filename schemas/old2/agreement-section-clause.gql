@@ -1,0 +1,38 @@
+type AgreementSectionClause {
+agreementSection: AgreementSection
+agreementSectionUid: UUID!
+clauseDto: ClauseDto!
+clauseUid: UUID
+uid: UUID
+}
+
+type AgreementSectionClauseDtoInput {
+agreementSection: AgreementSectionDtoInput
+agreementSectionUid: UUID!
+clauseDto: ClauseDtoInput!
+clauseUid: UUID
+uid: UUID
+}
+
+Mutation.addSectionClauseMapping(
+agreementSectionClauseDto: AgreementSectionClauseDtoInput
+): Response_AgreementSectionClause
+
+Mutation.removeSectionClauseMapping(
+agreementSectionClauseDto: AgreementSectionClauseDtoInput
+): Response_Boolean
+
+Query.agreementSectionClauseMappings: [AgreementSectionClause]
+
+Query.agreementSectionClauseMappingsByClause(
+clauseUid: UUID
+): [AgreementSectionClause]
+
+Query.agreementSectionClauseMappingsBySection(
+agreementSectionUid: UUID
+): [AgreementSectionClause]
+
+Mutation.removeClauseFromSection(
+agreementSectionUid: UUID
+clauseUid: UUID
+): Response_Boolean

@@ -2,7 +2,13 @@ import * as fs from "fs";
 // import { generateFromString } from "./generator/entity_generator.js";
 import { generateFromString } from "./generator/entity_generator_gasco.js";
 
-let schemas = ["schemas/plant.gql"];
+let schemas = [
+  "schemas/addendum.gql",
+  "schemas/addendum-section.gql",
+  "schemas/addendum-section-data.gql",
+  "schemas/addendum-clause.gql",
+  "schemas/addendum-clause-specification.gql",
+];
 
 schemas.forEach((src) => {
   console.log(`Generating files for ${src} ...`);

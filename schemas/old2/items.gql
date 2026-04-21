@@ -1,0 +1,189 @@
+type AgreementSection {
+agreementDto: AgreementDTO
+agreementUid: UUID
+description: String!
+name: String!
+uid: UUID
+}
+
+type AgreementSectionDtoInput {
+agreementDto: AgreementDTOInput
+agreementUid: UUID
+description: String!
+name: String!
+uid: UUID
+}
+ 
+Mutation.createAgreementSection(
+agreementSectionDto: AgreementSectionDtoInput
+): Response_AgreementSection
+
+Mutation.deleteAgreementSection(
+uid: UUID
+): Response_Boolean
+
+Query.findAgreementSectionByUid(
+uid: UUID
+): Response_AgreementSection
+
+Query.findAgreementSectionsByAgreement(
+agreementUid: UUID
+): [AgreementSection]
+
+Query.findAllAgreementSections: [AgreementSection]
+
+---------------------------------
+
+type AgreementSectionDatum {
+agreementSection: AgreementSectionDto!
+agreementSectionUid: UUID!
+description: String!
+name: String!
+uid: UUID
+}
+
+type AgreementSectionDatumDtoInput {
+agreementSection: AgreementSectionDtoInput!
+agreementSectionUid: UUID!
+description: String!
+name: String!
+uid: UUID
+}
+
+Mutation.deleteAgreementSectionDatum(
+uid: UUID
+): Response_Boolean
+
+Mutation.createAgreementSectionDatum(
+input: AgreementSectionDatumDtoInput
+): Response_AgreementSectionDatum
+
+Query.agreementSectionData: [AgreementSectionDatum]
+
+Query.agreementSectionDataByAgreementSection(
+agreementSectionUid: UUID
+): [AgreementSectionDatum]
+
+
+Query.agreementSectionDatum(
+uid: UUID
+): Response_AgreementSectionDatum
+
+---------------------------------------------------
+type AgreementSectionClause {
+agreementSection: AgreementSection
+agreementSectionUid: UUID!
+clauseDto: ClauseDto!
+clauseUid: UUID
+uid: UUID
+}
+
+type AgreementSectionClauseDtoInput {
+agreementSection: AgreementSectionDtoInput
+agreementSectionUid: UUID!
+clauseDto: ClauseDtoInput!
+clauseUid: UUID
+uid: UUID
+}
+
+Mutation.addSectionClauseMapping(
+agreementSectionClauseDto: AgreementSectionClauseDtoInput
+): Response_AgreementSectionClause
+
+Mutation.removeSectionClauseMapping(
+agreementSectionClauseDto: AgreementSectionClauseDtoInput
+): Response_Boolean
+
+Query.agreementSectionClauseMappings: [AgreementSectionClause]
+
+Query.agreementSectionClauseMappingsByClause(
+clauseUid: UUID
+): [AgreementSectionClause]
+
+Query.agreementSectionClauseMappingsBySection(
+agreementSectionUid: UUID
+): [AgreementSectionClause]
+
+Mutation.removeClauseFromSection(
+agreementSectionUid: UUID
+clauseUid: UUID
+): Response_Boolean
+
+----------------------------------------------
+
+type AgreementSectionClauseTemplate {
+agreementSection: AgreementSection
+agreementSectionUid: UUID!
+clause: ClauseDto
+clauseUid: UUID!
+layout: AgreementClauseTemplatesLayout
+layoutUid: UUID
+sequenceOrder: Int!
+uid: UUID
+}
+
+type AgreementSectionClauseTemplateDtoInput {
+agreementSection: AgreementSectionDtoInput
+agreementSectionUid: UUID!
+clause: ClauseDtoInput
+clauseUid: UUID!
+layout: AgreementClauseTemplatesLayoutDtoInput
+layoutUid: UUID
+sequenceOrder: Int!
+uid: UUID
+}
+
+Mutation.createClauseTemplatesBulk(
+templates: [AgreementSectionClauseTemplateDtoInput]
+): Response_List_AgreementSectionClauseTemplate
+
+Mutation.deleteAgreementClauseTemplatesLayout(
+uid: String
+): Response_Boolean
+
+Query.agreementSectionClauseTemplate(
+uid: UUID
+): Response_AgreementSectionClauseTemplate
+
+Query.agreementSectionClauseTemplates: [AgreementSectionClauseTemplate]
+
+Query.sectionClauseTemplatesByLayout(
+layoutUid: UUID
+): [AgreementSectionClauseTemplate]
+
+Mutation.flushSectionTemplatesByLayout(
+layoutUid: UUID
+templates: [AgreementSectionClauseTemplateDtoInput]
+): Response_List_AgreementSectionClauseTemplate
+
+Mutation.reorderTemplates(
+agreementSectionUid: UUID
+clauseUidsInOrder: [UUID]
+): Response_List_AgreementSectionClauseTemplate
+
+---------------------------------------------------------
+
+type AgreementClauseTemplatesLayout {
+name: String!
+uid: UUID
+}
+
+type AgreementClauseTemplatesLayoutDtoInput {
+name: String!
+uid: UUID
+}
+
+Mutation.createAgreementClauseTemplatesLayout(
+layoutDto: AgreementClauseTemplatesLayoutDtoInput
+): Response_AgreementClauseTemplatesLayout
+
+Mutation.deleteAgreementClauseTemplatesLayout(
+uid: String
+): Response_Boolean
+
+Query.agreementClauseTemplatesLayout(
+uid: UUID
+): Response_AgreementClauseTemplatesLayout
+
+Query.agreementClauseTemplatesLayouts: [AgreementClauseTemplatesLayout]
+

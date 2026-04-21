@@ -772,7 +772,7 @@ class EntityGenerator {
     let imports = "";
 
     // ignoring base entity since no standards
-    // let imports =  `import { BaseEntity } from "@common/utilities/data.interfaces";\n`;
+    // let imports =  `import { BaseEntity } from "@shared/utilities/data.interfaces";\n`;
 
     let content = "";
 
@@ -883,9 +883,9 @@ class EntityGenerator {
     //prettier-ignore
     console.log("--------------------Return Typers-------------------", allReturnTypes );
 
-    let imports = `import { baseGqlFields } from '@common/utilities/data.gql';\n`;
+    let imports = `import { baseGqlFields } from '@shared/utilities/data.gql';\n`;
     imports += `import { gql } from '@apollo/client/core';\n`;
-    imports += `import { responseGqlFields } from '@common/utilities/data.gql';\n`;
+    imports += `import { responseGqlFields } from '@shared/utilities/data.gql';\n`;
 
     let content = ``;
 
@@ -1023,7 +1023,7 @@ class EntityGenerator {
 
       ctypes.forEach((type) => {
         if (content.includes(type) && !imports.includes(type)) {
-          imports += `import { ${type} } from '@common/utilities/data.gql';\n`;
+          imports += `import { ${type} } from '@shared/utilities/data.gql';\n`;
         }
       });
 
@@ -1051,11 +1051,11 @@ class EntityGenerator {
 
     let imports = "";
     imports += `import { Component, OnInit } from '@angular/core';\n`;
-    imports += `import { PageHeaderComponent } from '@common/page-header.component';\n`;
-    imports += `import { BaseComponent } from '@common/components/base-componet/base-component';\n`;
-    imports += `import { DataGridComponent } from '@common/components/data-grid/data-grid.component';\n`;
-    imports += `import { ActionButton } from '@common/components/action-buttons/action-buttons.inteface';\n`;
-    imports += `import { GridParameter, GridKeyColumn } from '@common/components/data-grid/data-grid.interfaces';\n`;
+    imports += `import { PageHeaderComponent } from '@shared/page-header.component';\n`;
+    imports += `import { BaseComponent } from '@shared/components/base-componet/base-component';\n`;
+    imports += `import { DataGridComponent } from '@shared/components/data-grid/data-grid.component';\n`;
+    imports += `import { ActionButton } from '@shared/components/action-buttons/action-buttons.inteface';\n`;
+    imports += `import { GridParameter, GridKeyColumn } from '@shared/components/data-grid/data-grid.interfaces';\n`;
     imports += `\n`;
 
     imports += `import { ${listQueryName} } from './${kebabName}.graphql';\n`;
@@ -1068,7 +1068,7 @@ class EntityGenerator {
     content += `  imports: [DataGridComponent, PageHeaderComponent],\n`;
     content += "  template: ` \n";
     content += `    <div class="size-full flex-1 flex flex-col gap-3 ">\n`;
-    content += `      <app-page-header [title]="title" [subtitle]="subtitle" [actionButtons]="actionButtons" />\n`;
+    content += `      <page-header [title]="title" [subtitle]="subtitle" [actionButtons]="actionButtons" />\n`;
     content += `      <data-grid class="grow flex flex-col" theme="simple" [gridParameter]="gridParameter" />\n`;
     content += `    </div>\n`;
     content += "  `,\n";
@@ -1084,7 +1084,7 @@ class EntityGenerator {
     content += "\n";
 
     content += `  gridParameter: GridParameter = {\n`;
-    content += `     title: this.route.snapshot.data['label'],\n`;
+    content += `     title: this.route.snapshot.data['name'],\n`;
     content += `     icon: this.route.snapshot.data['icon'],\n`;
     content += `     keyColumns: this.keyColumns,\n`;
     content += `     actionButtons: ${camelName}TableBtns(this),\n`;
@@ -1131,16 +1131,16 @@ class EntityGenerator {
     let content = "";
 
     imports += `import { Subject } from 'rxjs';\n`;
-    imports += `import { MORE_BTN } from '@common/components/data-grid/data-grid.constants';\n`;
-    imports += `import { FormComponent } from '@common/components/generic-form/form.component';\n`;
-    imports += `import { FormParameters } from '@common/components/generic-form/form.interface';\n`;
-    imports += `import { BaseComponent } from '@common/components/base-componet/base-component';\n`;
-    imports += `import { getDeleteBtnProps } from '@common/components/contents-view/view.helpers';\n`;
-    imports += `import { getUpsertBtnProps } from '@common/components/contents-view/view.helpers';\n`;
-    imports += `import { navigateRelativeTo } from '@common/components/contents-view/view.helpers';\n`;
-    imports += `import { VALIDATOR_REQUIRED } from '@common/components/generic-form/form-constants';\n`;
-    imports += `import { FieldConfig, FieldType } from '@common/components/generic-form/field.interface';\n`;
-    imports += `import { ActionButton } from '@common/components/action-buttons/action-buttons.inteface';\n`;
+    imports += `import { MORE_BTN } from '@shared/components/data-grid/data-grid.constants';\n`;
+    imports += `import { FormComponent } from '@shared/components/generic-form/form.component';\n`;
+    imports += `import { FormParameters } from '@shared/components/generic-form/form.interface';\n`;
+    imports += `import { BaseComponent } from '@shared/components/base-componet/base-component';\n`;
+    imports += `import { getDeleteBtnProps } from '@shared/components/view-component/view.helpers';\n`;
+    imports += `import { getUpsertBtnProps } from '@shared/components/view-component/view.helpers';\n`;
+    imports += `import { navigateRelativeTo } from '@shared/components/view-component/view.helpers';\n`;
+    imports += `import { VALIDATOR_REQUIRED } from '@shared/components/generic-form/form-constants';\n`;
+    imports += `import { FieldConfig, FieldType } from '@shared/components/generic-form/field.interface';\n`;
+    imports += `import { ActionButton } from '@shared/components/action-buttons/action-buttons.inteface';\n`;
     imports += `\n`;
 
     imports += `import { ${createOperationName}, ${deleteOperationName} } from './${kebabName}.graphql';\n`;
@@ -1209,10 +1209,10 @@ class EntityGenerator {
     content += `        },\n`;
     content += `      };\n`;
     content += `\n`;
-    content += `      comp.vs?.openModal(FormComponent, formParameter, '96%', '720px');\n`;
+    content += `      comp.vs?.openModal(FormComponent, formParameter, '96%');\n`;
     content += `    },\n`;
     content += `    permissions: [],\n`;
-    content += `    ...getUpsertBtnProps('${titleName}','${idKey}'),\n`;
+    content += `    ...getUpsertBtnProps('${titleName}'),\n`;
     content += `  };\n`;
     content += `}\n`;
     content += `\n`;
@@ -1221,7 +1221,7 @@ class EntityGenerator {
     content += `  return {\n`;
     content += `    icon: 'view',\n`;
     content += `    label: 'View ${titleName}',\n`;
-    content += `    click: (data: ${entityName}) => navigateRelativeTo(comp, '${kebabPlural}', data?.${idKey}),\n`;
+    content += `    click: (data: ${entityName}) => navigateRelativeTo(comp, '${kebabPlural}', data?.uid),\n`;
     content += `    permissions: [],\n`;
     content += `  };\n`;
     content += `}\n`;
@@ -1323,7 +1323,7 @@ class EntityGenerator {
           fieldContentExtra += `    options: enumToObjectArray(${field.type})`;
 
           if (!imports.includes("enumToObjectArray")) {
-            imports += `import { enumToObjectArray } from '@common/utilities/object.helpers';\n`;
+            imports += `import { enumToObjectArray } from '@shared/utilities/object.helpers';\n`;
           }
 
           if (!imports.includes(field.type)) {
@@ -1417,17 +1417,16 @@ class EntityGenerator {
     let imports = "";
 
     //prettier-ignore
-    if (!arrayFields.length)  imports += `import { BehaviorSubject } from 'rxjs';\n`;
-    imports += `import { Component ${arrayFields.length ? ", OnInit" : ""} } from "@angular/core";\n`;
+
+    imports += `import { Component OnInit } from "@angular/core";\n`;
     imports += `import { CommonModule } from "@angular/common";\n`;
-    imports += `import { PageHeaderComponent } from "@common/page-header.component";\n`;
-    //prettier-ignore
-    if (!arrayFields.length)   imports += `import { ToObservablePipe } from '@common/pipes/to-observable.pipe';\n`;
-    imports += `import { BaseComponent } from "@common/components/base-componet/base-component";\n`;
-    imports += `import { ContentParameter } from "@common/components/contents-view/view.interface";\n`;
-    imports += `import { FetchParameter } from '@common/services/fetch.service';\n`;
-    imports += `import { ActionButton } from "@common/components/action-buttons/action-buttons.inteface";\n`;
-    imports += `import { ContentsViewComponent } from "@common/components/contents-view/contents-view.component";\n`;
+    imports += `import { PageHeaderComponent } from "@shared/page-header.component";\n`;
+
+    imports += `import { BaseComponent } from "@shared/components/base-componet/base-component";\n`;
+    imports += `import { ContentParameter } from "@shared/components/contents-view/view.interface";\n`;
+    imports += `import { FetchParameter } from '@shared/services/fetch.service';\n`;
+    imports += `import { ActionButton } from "@shared/components/action-buttons/action-buttons.inteface";\n`;
+    imports += `import { ContentsViewComponent } from "@shared/components/contents-view/contents-view.component";\n`;
 
     imports += `\n`;
     imports += `import { ${entityName} } from "./${kebabName}.interface";\n`;
@@ -1438,19 +1437,16 @@ class EntityGenerator {
     let content = "";
     content += `@Component({\n`;
     content += `  selector: 'app-${kebabName}.',\n`;
-    content += `  imports: [CommonModule, PageHeaderComponent, ContentsViewComponent ${!arrayFields.length ? ",ToObservablePipe" : ""}],\n`;
+    content += `  imports: [CommonModule, PageHeaderComponent, ContentsViewComponent ],\n`;
     content += "  template: `\n";
     content += `    <!--  -->\n`;
     content += `    <div class="size-full flex-1 flex flex-col gap-2">\n`;
-    content += `      <app-page-header\n`;
+    content += `      <page-header\n`;
     content += `        [title]="title"\n`;
     content += `        [subtitle]="subtitle"\n`;
     content += `        [actionButtons]="actionButtons"\n`;
 
-    //prettier-ignore
-    if(arrayFields.length) content += `        [data]="${camelName}"\n`;
-    //prettier-ignore
-    else content += `        [data]="fetchParameter?.data$ | toObservable | async"\n`;
+    content += `        [data]="${camelName}"\n`;
 
     content += `      />\n`;
 
@@ -1459,15 +1455,13 @@ class EntityGenerator {
     content += "   `\n";
     content += `})\n`;
 
-    content += `export class ${entityName}Component extends BaseComponent ${arrayFields.length ? "implements OnInit" : ""} {\n`;
+    content += `export class ${entityName}Component extends BaseComponent implements OnInit {\n`;
     content += `  override title = '${titleName}';\n`;
     content += `  override subtitle = '${titleName} Management';\n`;
 
-    if (arrayFields.length) {
-      content += `\n`;
-      content += `  ${camelName}: ${entityName} | undefined;\n`;
-      content += `  override contents: ContentParameter[] = [];\n`;
-    }
+    content += `\n`;
+    content += `  ${camelName}: ${entityName} | undefined;\n`;
+    content += `  override contents: ContentParameter[] = [];\n`;
 
     content += `  override actionButtons: ActionButton[] = [${camelName}UpsertBtn(this)];\n`;
     content += `\n`;
@@ -1480,12 +1474,6 @@ class EntityGenerator {
     content += `  fetchParameter: FetchParameter = {\n`;
     content += `    loadingOn: 'no-content',\n`;
     content += `    query: ${findOperationName},\n`;
-
-    //prettier-ignore
-    if (!arrayFields.length){
-      content += `    refetchActions: [${camelName}$],\n`; 
-      content += `    data$: new BehaviorSubject<${entityName} | undefined>(undefined),\n`;
-    }
     content += `    successFn:(res) => this.title = res?.data?.${nameKeys?.[0] ?? "name"},\n`;
     content += `    variables: { ${!!findOperation ? variables : "uid:" + uid}},\n`;
     content += `  };\n`;
@@ -1494,23 +1482,18 @@ class EntityGenerator {
     let items = this.getContentContents(entityName, mainType, arrayFields);
     imports += items[1];
 
-    if (arrayFields.length) {
-      content += `  async ngOnInit(): Promise<void> {\n`;
-      content += `    await this.setContents();\n`;
-      content += `    this.subs.add(${camelName}$.subscribe(() => this.setContents()));\n`;
-      content += `  }\n`;
-      content += `\n`;
+    content += `  async ngOnInit(): Promise<void> {\n`;
+    content += `    await this.setContents();\n`;
+    content += `    this.subs.add(${camelName}$.subscribe(() => this.setContents()));\n`;
+    content += `  }\n`;
+    content += `\n`;
 
-      content += `  async setContents() {\n`;
-      content += `    this.${camelName} = await this.fs.fetch(this.fetchParameter);\n`;
-      content += `\n`;
+    content += `  async setContents() {\n`;
+    content += `    this.${camelName} = await this.fs.fetch(this.fetchParameter);\n`;
+    content += `\n`;
 
-      content += items[0];
-
-      content += `  }\n`;
-    } else {
-      content += this._removeTabsFromEachLine(items[0], 2);
-    }
+    content += items[0];
+    content += `  }\n`;
 
     content += `\n`;
     content += `}\n`;
@@ -1523,14 +1506,12 @@ class EntityGenerator {
     let content = "";
     let imports = "";
 
-    if (arrayFields.length) content += `    this.contents = [\n`;
-    else content += `    override contents:ContentParameter[] = [\n`;
-
+    content += `    this.contents = [\n`;
     content += `      {\n`;
     content += `        type: 'details',\n`;
     content += `        icon: 'notes',\n`;
     content += `        showUndefined: true,\n`;
-    if (arrayFields.length) content += `        entity: this.${camelName},\n`;
+    content += `        entity: this.${camelName},\n`;
     content += `        fetchParameter: this.fetchParameter,\n`;
 
     if (arrayFields.length) {

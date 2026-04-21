@@ -1,0 +1,56 @@
+type Milestone {
+active: Boolean
+createdAt: LocalDateTime
+createdBy: Long
+description: String
+isMeasured: Boolean
+name: String
+paymentInvolved: Boolean
+uid: UUID
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type MilestoneRequestInput {
+description: String!
+isMeasured: Boolean!
+name: String!
+paymentInvolved: Boolean!
+uid: UUID
+}
+
+Mutation.deactivateMilestone(
+uuid: UUID
+): Response_Boolean
+
+Mutation.createMilestone(
+milestoneRequest: MilestoneRequestInput
+): Response_Milestone
+
+Mutation.deleteMilestone(
+uuid: UUID
+): Response_Boolean
+
+Query.searchMilestones(
+size: Int = 10
+term: String
+page: Int = 0
+): Response_Page_Milestone
+
+Query.milestonesByPaymentInvolved(
+paymentInvolved: Boolean
+): [Milestone]
+
+Query.milestoneKpiCount(
+uuid: UUID
+): Response_Long
+
+Query.milestone(
+uuid: UUID
+): Response_Milestone
+
+Query.milestones: [Milestone]
+
+Query.milestonesByIsMeasured(
+isMeasured: Boolean
+): [Milestone]

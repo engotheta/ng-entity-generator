@@ -1,0 +1,37 @@
+type AddendumSectionData {
+action: String
+createdAt: LocalDateTime
+description: String
+name: String
+updatedAt: LocalDateTime
+uuid: UUID
+}
+
+type AddendumSectionDataRequestInput {
+action: AddendumAction!
+addendumSectionUid: UUID!
+description: String
+name: String
+refAgreementSectionDatumUid: UUID
+uuid: UUID
+}
+
+Mutation.restoreAddendumSectionData(
+uuid: UUID!
+): Response_Void
+
+Mutation.saveOrUpdateAddendumSectionData(
+input: AddendumSectionDataRequestInput!
+): Response_AddendumSectionData
+
+Mutation.deleteAddendumSectionData(
+uuid: UUID!
+): Response_Void
+
+Query.getAddendumSectionDataByUid(
+uuid: UUID!
+): Response_AddendumSectionData
+
+Query.getAddendumSectionDataBySection(
+sectionUid: UUID!
+): Response_List_AddendumSectionData

@@ -1,0 +1,102 @@
+type AgreementAddendum {
+addendumNumber: String
+createdAt: LocalDateTime
+reasons: String
+status: String
+updatedAt: LocalDateTime
+uuid: UUID
+versionNumber: Long
+}
+
+type AgreementAddendumRequestInput {
+actionType: AddendumAction!
+agreementUid: UUID!
+reason: String!
+status: AddendumStatus!
+uuid: UUID
+}
+
+enum AddendumAction {
+ADD
+MODIFY
+}
+
+enum AddendumStatus {
+APPROVED
+DRAFT
+PENDING
+}
+
+Mutation.saveOrUpdateAddendum(
+input: AgreementAddendumRequestInput!
+): Response_AgreementAddendum
+
+Mutation.deleteAddendum(
+uid: UUID
+): Response_Void
+
+Mutation.restoreAddendum(
+uid: UUID
+): Response_Void
+
+Query.getAddendumByNumber(
+addendumNumber: String
+): Response_AgreementAddendum
+
+Query.getAddendumByUid(
+addendumUid: UUID
+): Response_AgreementAddendum
+
+Query.listAttachmentConfigAddendum: Response_List_AttachmentConfigResponse
+
+Query.getAddendumsPaginated(
+size: Int = 10
+page: Int = 0
+status: AddendumStatus
+): Response_Page_AgreementAddendum
+
+Query.getAddendumsByAgreement(
+agreementUid: UUID
+): Response_List_AgreementAddendum
+
+
+enum EntityType {
+ACADEMIC_CERTIFICATION
+ADDENDUM
+AGREEMENT
+CASE
+COMPANY_LOGO
+CONTRACT
+INCOMING
+MEETING_AGENDA
+NOTICE_REPORT_CAUSE_OF_ACTION
+OPINION
+PROFILE_PIC_ATT
+PROFILE_PIC_PUBLIC
+PROFILE_PIC_STAFF
+PUBLICATION
+RESEARCH
+SIGNATURE
+SITE
+}
+
+type AttachmentConfigResponse {
+active: Boolean
+attachmentType: AttachmentType
+description: String
+entityType: EntityType
+label: String
+maxFiles: Long
+uuid: UUID
+}
+
+type AttachmentType {
+active: Boolean
+code: String
+description: String
+name: String
+}
+
+Mutation.saveAddendumAttachments(
+input: AddendumAttachmentsRequestInput
+): Response_String

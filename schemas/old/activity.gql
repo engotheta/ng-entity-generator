@@ -1,0 +1,95 @@
+ type Activity {
+active: Boolean!
+agreementActivities: [AgreementActivity]
+code: String!
+description: String!
+duration: BigDecimal!
+finish: OffsetDateTime!
+name: String!
+start: OffsetDateTime!
+}
+
+type ActivityDto {
+active: Boolean!
+code: String!
+description: String!
+duration: BigDecimal!
+finish: OffsetDateTime!
+name: String!
+start: OffsetDateTime!
+}
+
+type ActivityDtoInput {
+active: Boolean!
+code: String!
+description: String!
+duration: BigDecimal!
+finish: OffsetDateTime!
+name: String!
+start: OffsetDateTime!
+}
+
+type ActivityFilterInput {
+active: Boolean
+code: String
+name: String
+}
+
+type ActivityResponse {
+active: Boolean
+code: String
+description: String
+duration: BigDecimal
+finish: OffsetDateTime
+id: Long
+name: String
+start: OffsetDateTime
+uuid: UUID
+}
+
+type AgreementActivity {
+activity: Activity
+agreement: Agreement
+id: Long
+}
+
+Mutation.removeActivityFromAgreement(
+agreementUuid: UUID
+activityUuid: UUID
+): Response_String
+
+Mutation.changeActivityStatus(
+uuid: UUID
+): Response_ActivityDto
+
+Mutation.addActivityToAgreement(
+agreementUuid: UUID
+input: ActivityDtoInput
+): Response_ActivityDto
+
+Mutation.linkExistingActivityToAgreement(
+agreementUuid: UUID
+activityUuid: UUID
+): Response_String
+
+Mutation.deleteActivity(
+uuid: UUID
+): Response_Activity
+Mutation.updateActivity(
+input: ActivityDtoInput
+uuid: UUID
+): Response_ActivityDto
+Query.listActivityByUserId(
+userId: Long
+): Response_List_ActivityResponse
+Query.activityListSearch(
+filter: ActivityFilterInput = {}
+pagination: PaginationInput
+): PageResponse_ActivityDto
+Query.findAllActivity: Response_List_ActivityResponse
+Query.findActivityByUid(
+uuid: UUID
+): Response_ActivityResponse
+Query.findAgreementActivity(
+uuid: UUID
+): Response_List_ActivityResponse

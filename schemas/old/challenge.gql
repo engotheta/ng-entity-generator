@@ -1,0 +1,88 @@
+type Challenge {
+active: Boolean!
+agreementChallenges: [AgreementChallenge]
+code: String!
+description: String!
+name: String!
+}
+
+type AgreementChallenge {
+agreement: Agreement!
+challenge: Challenge!
+id: Long
+}
+
+type ChallengeDtoInput {
+active: Boolean!
+code: String!
+description: String!
+name: String!
+uuid: UUID
+}
+
+type ChallengeFilterInput {
+active: Boolean
+code: String
+name: String
+status: String
+}
+
+type ChallengeResponse {
+active: Boolean
+code: String
+description: String
+id: Long
+name: String
+uuid: UUID
+}
+
+Mutation.deleteChallenge(
+uuid: UUID
+): Response_String
+
+Mutation.addChallengeToAgreement(
+input: ChallengeDtoInput
+agreementId: UUID
+): Response_ChallengeDto
+
+Mutation.linkChallengeToAgreement(
+agreementUuid: UUID
+challengeUuid: UUID
+): Response_String
+
+Mutation.createChallenge(
+input: ChallengeDtoInput
+): Response_ChallengeDto
+
+Mutation.changeChallengeStatus(
+uuid: UUID
+): Response_ChallengeDto
+
+Mutation.updateChallenge(
+input: ChallengeDtoInput
+uuid: UUID
+): Response_ChallengeDto
+
+Mutation.unlinkChallengeFromAgreement(
+agreementUuid: UUID
+challengeUuid: UUID
+): Response_String
+
+Query.getAgreementChallenge(
+agreementId: UUID
+): Response_List_ChallengeResponse
+
+Query.getAllChallengesByUserId(
+userId: Long
+): Response_List_ChallengeResponse
+
+Query.challengesSearch(
+filter: ChallengeFilterInput = {}
+pagination: PaginationInput
+): PageResponse_ChallengeResponse
+
+Query.getChallengeByUid(
+uuid: UUID
+): Response_ChallengeResponse
+
+Query.listAllChallenges: Response_List_ChallengeResponse

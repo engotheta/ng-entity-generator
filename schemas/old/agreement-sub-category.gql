@@ -1,0 +1,64 @@
+type AgreementSubcategory {
+active: Boolean
+agreementCategory: AgreementCategory
+code: String
+description: String
+name: String
+}
+
+type AgreementSubcategoryDTO {
+active: Boolean
+agreementCategoryName: String
+agreementCategoryUuid: UUID
+category: AgreementCategoryDTO
+code: String
+description: String
+name: String
+uuid: UUID
+}
+
+type AgreementSubcategoryFilterInput {
+active: Boolean
+agreementCategoryId: Long
+direction: String
+page: Int
+size: Int
+sortBy: String
+term: String
+}
+
+type CreateAgreementSubcategoryInputInput {
+agreementCategoryUuid: UUID!
+code: String
+description: String
+name: String!
+}
+
+type UpdateAgreementSubcategoryInputInput {
+active: Boolean
+agreementCategoryUuid: UUID
+code: String
+description: String
+name: String
+}
+
+Mutation.createAgreementSubcategory(
+input: CreateAgreementSubcategoryInputInput
+): Response_AgreementSubcategoryDTO
+Mutation.deleteAgreementSubcategory(
+uuid: UUID!
+): Response_Boolean
+Mutation.updateAgreementSubcategory(
+input: UpdateAgreementSubcategoryInputInput
+uuid: UUID!
+): Response_AgreementSubcategoryDTO
+Query.searchAgreementSubcategories(
+filter: AgreementSubcategoryFilterInput
+): Response_Page_AgreementSubcategoryDTO
+Query.agreementSubcategories: Response_List_AgreementSubcategoryDTO
+Query.agreementSubcategoriesByCategory(
+agreementCategoryId: Long!
+): Response_List_AgreementSubcategoryDTO
+Query.agreementSubcategoryByUuid(
+uuid: UUID!
+): Response_AgreementSubcategoryDTO

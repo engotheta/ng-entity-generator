@@ -1,0 +1,293 @@
+type AgreementSection {
+agreement: Agreement!
+layoutSection: LayoutSection!
+}
+
+type AgreementSection {
+agreementName: String
+agreementUid: UUID
+createdAt: LocalDateTime
+createdBy: Long
+layoutSectionName: String
+layoutSectionUid: UUID
+uid: UUID
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type AgreementSectionDtoInput {
+agreementName: String
+agreementUid: UUID
+createdAt: LocalDateTime
+createdBy: Long
+layoutSectionName: String
+layoutSectionUid: UUID
+uid: UUID
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+Mutation.createAgreementSection(
+sectionDto: AgreementSectionDtoInput
+): Response_AgreementSection
+
+Mutation.deleteAgreementSection(
+agreementSectionUid: UUID
+): Response_Boolean
+
+Mutation.deleteAllAgreementSectionsByAgreement(
+agreementUid: UUID
+): Response_Boolean
+
+Mutation.removeTemplateFromSection(
+agreementSectionUid: UUID
+): Response_Boolean
+
+Query.agreementSection(
+uid: UUID
+): Response_AgreementSection
+
+Query.agreementSectionsByAgreement(
+agreementUid: UUID
+): [AgreementSection]
+
+Query.agreementSectionsByAgreementPaginated(
+agreementUid: UUID
+page: PaginationInput = {pageNumber: 0, pageSize: 20, sort: {orders: []}}
+): Page_AgreementSection
+
+Query.agreementSections: [AgreementSection]
+
+
+-----------------------------------------------------------------------------------------
+
+type AgreementSectionDatum {
+agreementSection: AgreementSection!
+agreementSectionUid: UUID!
+description: String!
+name: String!
+uid: UUID
+}
+
+type AgreementSectionDatumDtoInput {
+agreementSection: AgreementSectionDtoInput!
+agreementSectionUid: UUID!
+description: String!
+name: String!
+uid: UUID
+}
+
+Mutation.deleteAgreementSectionDatum(
+uid: UUID
+): Response_Boolean
+
+Mutation.createAgreementSectionDatum(
+input: AgreementSectionDatumDtoInput
+): Response_AgreementSectionDatum
+
+Query.agreementSectionData: [AgreementSectionDatum]
+
+Query.agreementSectionDataByAgreementSection(
+agreementSectionUid: UUID
+): [AgreementSectionDatum]
+
+Query.agreementSectionDatum(
+uid: UUID
+): Response_AgreementSectionDatum
+
+-----------------------------------------------------------------------------------------
+
+
+type AgreementSectionsClauseSpecification{
+agreementSection: AgreementSectionDto
+agreementSectionUid: UUID
+clause: ClauseDto
+clauseUid: UUID
+createdAt: LocalDateTime
+createdBy: Long
+requiredData: String
+specification: String
+uid: UUID
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type AgreementSectionsClauseSpecificationRequestInput {
+agreementSectionUid: UUID!
+clauseUid: UUID!
+requiredData: String!
+specification: String!
+uid: UUID
+}
+
+Mutation.deleteSpecification(
+uuid: UUID
+): Response_Boolean
+
+Mutation.createSpecification(
+agmSectionClauseSpecRequest: AgreementSectionsClauseSpecificationRequestInput
+): Response_AgreementSectionsClauseSpecification
+
+Query.specificationCountByAgreementSection(
+agreementSectionUid: UUID
+): Response_Long
+
+Query.specificationCountByClause(
+clauseUid: UUID
+): Response_Long
+
+Query.specifications: [AgreementSectionsClauseSpecification]
+
+Query.specification(
+uuid: UUID
+): Response_AgreementSectionsClauseSpecification
+
+Query.searchSpecifications(
+size: Int = 10
+term: String
+page: Int = 0
+): Response_Page_AgreementSectionsClauseSpecification
+
+Query.specificationsByAgreementSection(
+agreementSectionUid: UUID
+): [AgreementSectionsClauseSpecification]
+
+Query.specificationsByClause(
+clauseUid: UUID
+): [AgreementSectionsClauseSpecification]
+
+
+------------------------------------------------------
+
+type ClauseRightsDatum {
+agreementSectionsClauseSpecification: AgreementSectionsClauseSpecification!
+endDate: LocalDate!
+frequency: ClauseRightFrequencyType
+id: Long
+numberOfDays: BigDecimal!
+right: Right!
+startDate: LocalDate!
+status: ClauseRightStatus
+uuid: UUID!
+}
+
+type ClauseRightsDatumDto {
+agreementSectionsClauseSpecificationUuid: UUID!
+endDate: LocalDate!
+frequency: ClauseRightFrequencyType!
+numberOfDays: BigDecimal!
+rightUuid: UUID!
+startDate: LocalDate!
+status: ClauseRightStatus
+uuid: UUID!
+}
+
+type ClauseRightsDatumDtoInput {
+agreementSectionsClauseSpecificationUuid: UUID!
+endDate: LocalDate!
+frequency: ClauseRightFrequencyType!
+numberOfDays: BigDecimal!
+rightUuid: UUID!
+startDate: LocalDate!
+status: ClauseRightStatus
+uuid: UUID!
+}
+
+Mutation.deleteClauseRightsDatum(
+uuid: UUID
+): Response_String
+
+Mutation.saveClauseRightsDatum(
+input: ClauseRightsDatumDtoInput
+): Response_ClauseRightsDatum
+
+Query.searchClauseRightsData(
+pageNumber: Int = 0
+pageSize: Int = 10
+term: String
+): Response_Page_ClauseRightsDatum
+
+Query.findAllClauseRightsData: [ClauseRightsDatum]
+
+----------------------------------------------
+
+type RightMilestoneDatum {
+active: Boolean
+clauseRightsDatumDto: ClauseRightsDatumDto
+clauseRightsDatumUid: UUID
+createdAt: LocalDateTime
+createdBy: Long
+dueDate: LocalDate
+milestoneDto: MilestoneDto
+milestoneUid: UUID
+progress: Float
+status: ProcessStatus
+updatedAt: LocalDateTime
+updatedBy: Long
+uuid: UUID
+}
+
+type RightMilestoneDatumRequestInput {
+clauseRightsDatumUid: String
+dueDate: LocalDate
+milestoneUid: String
+progress: Float
+status: String
+uid: UUID
+}
+
+Mutation.softDeleteRightMilestoneData(
+uuid: UUID
+): Response_Boolean
+
+Mutation.updateRightMilestoneDataProgress(
+progress: Float
+uuid: UUID
+): Response_RightMilestoneDatum
+
+Mutation.deleteRightMilestoneData(
+uuid: UUID
+): Response_Boolean
+
+Mutation.createRightMilestoneData(
+rightMilestoneDataRequest: RightMilestoneDatumRequestInput
+): Response_RightMilestoneDatum
+
+Query.getRightMilestonesByClauseRights(
+clauseRightsUuid: UUID
+): Response_List_RightMilestoneDatum
+
+Query.listAllRightMilestones: Response_List_RightMilestoneDatum
+
+Query.getRightMilestonesByMilestone(
+milestoneUuid: UUID
+): Response_List_RightMilestoneDatum
+
+Query.getRightMilestonesByStatus(
+sortDirection: String = "ASC"
+size: Int = 10
+sortBy: String = "dueDate"
+page: Int = 0
+status: ProcessStatus
+): Response_Page_RightMilestoneDatum
+
+Query.getRightMilestonesByDueDateRange(
+endDate: LocalDate
+startDate: LocalDate
+): Response_List_RightMilestoneDatum
+
+Query.getRightMilestonesByProgressRange(
+maxProgress: Float = 100
+minProgress: Float = 0
+): Response_List_RightMilestoneDatum
+
+Query.getRightMilestoneByUuid(
+uuid: UUID
+): Response_RightMilestoneDatum
+
+Query.getAllRightMilestones(
+sortDirection: String = "DESC"
+size: Int = 10
+sortBy: String = "id"
+page: Int = 0
+): Response_Page_RightMilestoneDatum

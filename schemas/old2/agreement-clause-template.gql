@@ -1,0 +1,49 @@
+type AgreementSectionClauseTemplate {
+agreementSection: AgreementSection
+agreementSectionUid: UUID!
+clause: ClauseDto
+clauseUid: UUID!
+layout: AgreementClauseTemplatesLayout
+layoutUid: UUID
+sequenceOrder: Int!
+uid: UUID
+}
+
+type AgreementSectionClauseTemplateDtoInput {
+agreementSection: AgreementSectionDtoInput
+agreementSectionUid: UUID!
+clause: ClauseDtoInput
+clauseUid: UUID!
+layout: AgreementClauseTemplatesLayoutDtoInput
+layoutUid: UUID
+sequenceOrder: Int!
+uid: UUID
+}
+
+Mutation.createClauseTemplatesBulk(
+templates: [AgreementSectionClauseTemplateDtoInput]
+): Response_List_AgreementSectionClauseTemplate
+
+Mutation.deleteAgreementClauseTemplatesLayout(
+uid: String
+): Response_Boolean
+
+Query.agreementSectionClauseTemplate(
+uid: UUID
+): Response_AgreementSectionClauseTemplate
+
+Query.agreementSectionClauseTemplates: [AgreementSectionClauseTemplate]
+
+Query.sectionClauseTemplatesByLayout(
+layoutUid: UUID
+): [AgreementSectionClauseTemplate]
+
+Mutation.flushSectionTemplatesByLayout(
+layoutUid: UUID
+templates: [AgreementSectionClauseTemplateDtoInput]
+): Response_List_AgreementSectionClauseTemplate
+
+Mutation.reorderTemplates(
+agreementSectionUid: UUID
+clauseUidsInOrder: [UUID]
+): Response_List_AgreementSectionClauseTemplate

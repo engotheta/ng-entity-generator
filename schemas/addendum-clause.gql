@@ -1,0 +1,46 @@
+type AddendumClause {
+action: String
+clauseNumber: String
+clauseOrder: Int
+clauseText: String
+clauseTitle: String
+isMandatory: Boolean
+isNegotiable: Boolean
+refClauseId: Long
+uuid: UUID
+}
+
+type AddendumClauseRequestInput {
+action: AddendumAction!
+addendumSectionUid: UUID!
+clauseNumber: String
+clauseOrder: Int
+clauseText: String!
+clauseTitle: String!
+isMandatory: Boolean
+isNegotiable: Boolean
+legalReference: String
+reasonForAmendment: String!
+refClauseUid: UUID
+uuid: UUID
+}
+
+Mutation.restoreAddendumClause(
+clauseUid: UUID!
+): Response_Void
+
+Mutation.deleteAddendumClause(
+clauseUid: UUID!
+): Response_Void
+
+Mutation.saveOrUpdateAddendumClause(
+input: AddendumClauseRequestInput!
+): Response_AddendumClause
+
+Query.getAddendumClauseByUid(
+uuid: UUID!
+): Response_AddendumClause
+
+Query.getAddendumClausesBySection(
+sectionUid: UUID!
+): Response_List_AddendumClause

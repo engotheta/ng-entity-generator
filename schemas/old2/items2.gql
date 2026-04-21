@@ -1,0 +1,297 @@
+type Kpi {
+active: Boolean
+category: Long
+categoryName: KPICategoryEnum
+createdAt: LocalDateTime
+createdBy: Long
+description: String
+id: Long
+milestone: MilestoneDto
+name: String
+status: KPIStatusEnum
+target: String
+updatedAt: LocalDateTime
+updatedBy: Long
+uuid: UUID
+}
+
+enum KPICategoryEnum {
+COMPLIANCE
+FINANCIAL
+OPERATIONAL
+Other
+QUALITY
+}
+
+enum KPIStatusEnum {
+COMPLETED
+INPROGRESS
+PENDING
+}
+
+type KpiRequestInput {
+category: KPICategoryEnum!
+description: String
+evidenceRequired: Boolean!
+milestoneUid: UUID
+name: String!
+status: KPIStatusEnum
+target: String!
+uid: UUID
+}
+
+
+
+Mutation.deactivateKpi(
+uuid: UUID
+): Response_Boolean
+
+Mutation.softDeleteKpi(
+uuid: UUID
+): Response_Boolean
+
+Mutation.createKpi(
+kpiRequest: KpiRequestInput
+): Response_Kpi
+
+Mutation.deleteKpi(
+uuid: UUID
+): Response_Boolean
+
+Mutation.toggleKpiStatus(
+active: Boolean
+uuid: UUID
+): Response_Kpi
+
+Query.kpisByEvidenceRequired(
+evidenceRequired: Boolean
+): [Kpi]
+
+Query.kpisByStatus(
+status: KPIStatusEnum
+): [Kpi]
+
+Query.kpisByCategory(
+category: KPICategoryEnum
+): [Kpi]
+
+Query.getAllKpis: [Kpi]
+
+Query.milestoneKpiCount(
+uuid: UUID
+): Response_Long
+
+Query.getKpiByUuid(
+uuid: UUID
+): Response_Kpi
+
+Query.searchKpis(
+sortDirection: String = "ASC"
+size: Int = 10
+sortBy: String = "name"
+term: String
+page: Int = 0
+): Response_Page_Kpi
+
+Query.kpisByMilestone(
+milestoneUid: UUID
+): [Kpi]
+
+---------------------------------------------------
+
+type Mitigation {
+active: Boolean!
+code: String!
+description: String!
+mitigations: Long
+mitigationsAt: LocalDate!
+mitigationsBy: Long!
+name: String!
+}
+
+type MitigationDtoInput {
+active: Boolean!
+code: String!
+description: String!
+mitigationsAt: LocalDate!
+mitigationsBy: Long!
+mitigationsUuid: UUID
+name: String!
+uuid: UUID
+}
+
+type MitigationResponse {
+active: Boolean
+code: String
+description: String
+id: Long
+mitigations: Long
+mitigationsAt: LocalDate
+mitigationsBy: Long
+name: String
+uuid: UUID
+}
+
+Mutation.changeMitigationStatus(
+uuid: UUID
+): Response_String
+
+Mutation.saveMitigation(
+input: MitigationDtoInput
+): Response_Mitigation
+
+Mutation.deleteMitigation(
+uuid: UUID
+): Response_String
+
+Mutation.removeMitigationFromRisk(
+mitigationUid: UUID
+riskUid: UUID
+): Response_Boolean
+
+Mutation.saveMitigationToRisk(
+input: MitigationDtoInput
+riskUid: UUID
+): Response_MitigationResponse
+
+Mutation.linkExistingMitigationToRisk(
+mitigationUid: UUID
+riskUid: UUID
+): Response_MitigationResponse
+
+Query.getMitigationsByRisk(
+riskUid: UUID
+): Response_List_MitigationResponse
+
+Query.searchMitigations(
+pageNumber: Int = 0
+pageSize: Int = 10
+term: String
+): Response_Page_MitigationResponse
+
+Query.findAllMitigations: [Mitigation]
+
+
+
+
+---------------------------------------
+
+type Penalty {
+active: Boolean!
+penaltyAmount: BigDecimal!
+penaltyCode: String!
+penaltyDescription: String!
+penaltyName: String!
+rightUuid: UUID!
+uuid: UUID
+}
+
+type PenaltyDtoInput {
+active: Boolean!
+penaltyAmount: BigDecimal!
+penaltyCode: String!
+penaltyDescription: String!
+penaltyName: String!
+rightUuid: UUID!
+uuid: UUID
+}
+
+type PenaltyResponse {
+active: Boolean
+id: Long
+penaltyAmount: BigDecimal
+penaltyCode: String
+penaltyDescription: String
+penaltyName: String
+uuid: UUID
+}
+
+Mutation.createOrUpdatePenalty(
+input: PenaltyDtoInput
+): Response_Penalty
+
+Mutation.changePenaltyStatus(
+uuid: UUID
+): Response_Boolean
+
+Mutation.deletePenalty(
+uuid: UUID
+): Response_Boolean
+
+Query.penaltySearch(
+pageNumber: Int = 0
+pageSize: Int = 10
+term: String
+): Response_Page_PenaltyResponse
+
+Query.findPenaltyByUid(
+uuid: UUID
+): Response_PenaltyResponse
+
+Query.findPenalities: Response_List_PenaltyResponse
+
+-------------------------------
+
+
+type Risk {
+active: Boolean
+description: String
+name: String
+right: Right
+riskScore: BigDecimal
+severity: String
+uuid: UUID
+}
+
+type RiskFilterInput {
+active: Boolean
+direction: String
+isMitigated: Boolean
+likelihood: String
+page: Int
+riskOwnerId: Long
+severity: String
+size: Int
+sortBy: String
+term: String
+}
+
+type RiskInputRequestInput {
+active: Boolean!
+description: String!
+name: String!
+rightUuid: UUID!
+riskScore: BigDecimal!
+severity: RiskSeverity!
+uuid: UUID
+}
+
+enum RiskSeverity {
+CRITICAL
+HIGH
+LOW
+MEDIUM
+VERY_LOW
+}
+
+Mutation.deleteRisk(
+uuid: UUID!
+): Response_Boolean
+
+Mutation.createOrUpdateRisk(
+input: RiskInputRequestInput
+): Response_Risk
+
+Query.searchRisks(
+filter: RiskFilterInput = {}
+): Response_Page_Risk
+
+Query.risks: Response_List_Risk
+
+Query.risksBySeverity(
+severity: String!
+): Response_List_Risk
+
+Query.riskByUuid(
+uuid: UUID!
+): Response_Risk

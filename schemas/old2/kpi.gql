@@ -1,0 +1,98 @@
+type Kpi {
+active: Boolean
+category: Long
+categoryName: KPICategoryEnum
+createdAt: LocalDateTime
+createdBy: Long
+description: String
+id: Long
+milestone: MilestoneDto
+name: String
+status: KPIStatusEnum
+target: String
+updatedAt: LocalDateTime
+updatedBy: Long
+uuid: UUID
+}
+
+enum KPICategoryEnum {
+COMPLIANCE
+FINANCIAL
+OPERATIONAL
+Other
+QUALITY
+}
+
+enum KPIStatusEnum {
+COMPLETED
+INPROGRESS
+PENDING
+}
+
+type KpiRequestInput {
+category: KPICategoryEnum!
+description: String
+evidenceRequired: Boolean!
+milestoneUid: UUID
+name: String!
+status: KPIStatusEnum
+target: String!
+uid: UUID
+}
+
+
+
+Mutation.deactivateKpi(
+uuid: UUID
+): Response_Boolean
+
+Mutation.softDeleteKpi(
+uuid: UUID
+): Response_Boolean
+
+Mutation.createKpi(
+kpiRequest: KpiRequestInput
+): Response_Kpi
+
+Mutation.deleteKpi(
+uuid: UUID
+): Response_Boolean
+
+Mutation.toggleKpiStatus(
+active: Boolean
+uuid: UUID
+): Response_Kpi
+
+Query.kpisByEvidenceRequired(
+evidenceRequired: Boolean
+): [Kpi]
+
+Query.kpisByStatus(
+status: KPIStatusEnum
+): [Kpi]
+
+Query.kpisByCategory(
+category: KPICategoryEnum
+): [Kpi]
+
+Query.getAllKpis: [Kpi]
+
+Query.milestoneKpiCount(
+uuid: UUID
+): Response_Long
+
+Query.getKpiByUuid(
+uuid: UUID
+): Response_Kpi
+
+Query.searchKpis(
+sortDirection: String = "ASC"
+size: Int = 10
+sortBy: String = "name"
+term: String
+page: Int = 0
+): Response_Page_Kpi
+
+Query.kpisByMilestone(
+milestoneUid: UUID
+): [Kpi]

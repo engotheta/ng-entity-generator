@@ -1,0 +1,46 @@
+type AgreementTemplate{
+agreementSubcategory: AgreementSubcategoryDTO
+agreementSubcategoryUid: UUID!
+agreementTemplatesLayout: AgreementTemplatesLayoutDto
+layoutSection: LayoutSectionDto
+layoutSectionUid: UUID!
+sequenceOrder: Long!
+templatesLayoutUid: UUID!
+uid: UUID
+}
+
+type AgreementTemplateDtoInput {
+agreementSubcategory: AgreementSubcategoryDTOInput
+agreementSubcategoryUid: UUID!
+agreementTemplatesLayout: AgreementTemplatesLayoutDtoInput
+layoutSection: LayoutSectionDtoInput
+layoutSectionUid: UUID!
+sequenceOrder: Long!
+templatesLayoutUid: UUID!
+uid: UUID
+}
+
+Mutation.createAgreementTemplate(
+layoutUid: UUID
+templates: [AgreementTemplateDtoInput]
+subcategoryUid: UUID
+): Response_List_AgreementTemplate
+
+Query.templatesByLayout(
+layoutUid: UUID
+): [AgreementTemplate]
+
+Query.agreementTemplate(
+uid: UUID
+): Response_AgreementTemplate
+
+
+Query.templatesBySubcategory(
+subcategoryUid: UUID
+): [AgreementTemplate]
+
+Query.agreementTemplates: [AgreementTemplate]
+
+Query.templatesBySection(
+sectionUid: UUID
+): [AgreementTemplate]

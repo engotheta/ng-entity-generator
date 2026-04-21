@@ -1,0 +1,97 @@
+type Accepted {
+acceptedAt: LocalDate
+acceptedBy: Long
+active: Boolean
+agreementLinks: [AgreementAccepted]
+code: String
+description: String
+name: String
+}
+
+type AcceptedDto {
+acceptedAt: LocalDate
+active: Boolean
+code: String
+description: String
+id: Long
+name: String
+uuid: UUID
+}
+
+type AcceptedDtoInput {
+acceptedAt: LocalDate
+active: Boolean
+code: String
+description: String
+id: Long
+name: String
+uuid: UUID
+}
+
+type AcceptedFilterInput {
+active: Boolean
+code: String
+name: String
+}
+
+type AcceptedResponse {
+acceptedAt: LocalDate
+active: Boolean
+code: String
+description: String
+id: Long
+name: String
+uuid: UUID
+}
+
+type AgreementAccepted {
+accepted: Accepted!
+agreement: Agreement!
+id: Long
+}
+
+
+Mutation.linkExistingAcceptedToAgreement(
+agreementUuid: UUID
+acceptedUuid: UUID
+): Response_String
+
+Mutation.addAcceptedToAgreement(
+agreementUuid: UUID
+input: AcceptedDtoInput
+): Response_AcceptedDto
+
+Mutation.removeAcceptedFromAgreement(
+agreementUuid: UUID
+acceptedUuid: UUID
+): Response_String
+
+Query.acceptedListSearch(
+filter: AcceptedFilterInput = {}
+pagination: PaginationInput
+): PageResponse_AcceptedResponse
+
+Query.acceptedList: Response_List_AcceptedDto
+
+Query.acceptedAgreementTerms(
+agreementUuid: UUID!
+): Response_List_AgreementTermResponse
+
+Query.acceptedByUuid(
+uuid: UUID
+): Response_AcceptedDto
+
+Query.agreementsByAcceptedUuid(
+uuid: UUID
+): Response_List_Agreement
+
+Mutation.changeAcceptanceStatus(
+uuid: UUID
+): Response_AcceptedDto
+Query.findAcceptancesOfAgreement(
+uuid: UUID
+): Response_List_AcceptedDto
+
+Query.acceptancesByUserId(
+userId: Long
+): Response_List_AcceptedResponse

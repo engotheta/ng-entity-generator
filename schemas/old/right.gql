@@ -1,0 +1,186 @@
+type Right {
+active: Boolean
+category: Long
+code: String
+conditions: String
+description: String
+effectiveDate: LocalDate
+exerciseDate: LocalDate
+exerciseNotes: String
+expiryDate: LocalDate
+grantorPartyId: Long
+group: Long
+isExercised: Boolean
+isTransferable: Boolean
+linkedClauseId: Long
+name: String
+rightHolderId: Long
+rightText: String
+sequenceOrder: Int
+status: Long
+type: Long
+uuid: UUID
+}
+
+type CreateRightInputInput {
+category: Long
+code: String
+conditions: String
+description: String
+effectiveDate: LocalDate
+exerciseDate: LocalDate
+exerciseNotes: String
+expiryDate: LocalDate
+grantorPartyId: Long
+group: Long
+isExercised: Boolean
+isTransferable: Boolean
+linkedClauseId: Long
+name: String!
+rightHolderId: Long
+rightText: String
+sequenceOrder: Int
+status: Long
+type: Long
+}
+
+
+Mutation.exerciseRight(
+exerciseNotes: String
+uuid: UUID!
+): Response_Right
+
+Mutation.deleteRight(
+uuid: UUID!
+): Response_Boolean
+
+Mutation.createRight(
+input: CreateRightInputInput
+): Response_Right
+
+
+Query.rightByUuid(
+uuid: UUID!
+): Response_Right
+
+Query.unexercisedRights: Response_List_Right
+
+Query.rightsByHolder(
+partyId: Long!
+): Response_List_Right
+
+
+Query.searchRights(
+filter: RightFilterInput
+): Response_Page_Right
+
+Query.rights: Response_List_Right
+
+Query.expiringRights(
+daysAhead: Int = 30
+): Response_List_Right
+
+
+
+Mutation.updateRight(
+input: UpdateRightInputInput
+uuid: UUID!
+): Response_Right
+
+
+type RightFilterInput {
+active: Boolean
+category: Long
+direction: String
+effectiveDateFrom: LocalDate
+effectiveDateTo: LocalDate
+isExercised: Boolean
+isTransferable: Boolean
+page: Int
+rightHolderId: Long
+size: Int
+sortBy: String
+term: String
+type: Long
+}
+
+
+
+--------------------------------------------------------------------
+
+type AgreementRight {
+agreement: AgreementDTO
+agreementUuid: UUID
+enforcementStatus: String
+exerciseDate: LocalDate
+exerciseEvidence: String
+isExercised: Boolean
+notes: String
+right: Right
+rightUuid: UUID
+specificEffectiveDate: LocalDate
+specificExpiryDate: LocalDate
+uuid: UUID
+}
+
+type CreateAgreementRightInputInput {
+agreementUuid: UUID!
+enforcementStatus: String
+exerciseDate: LocalDate
+exerciseEvidence: String
+isExercised: Boolean
+notes: String
+rightUuid: UUID!
+specificEffectiveDate: LocalDate
+specificExpiryDate: LocalDate
+}
+ 
+Mutation.removeRightFromAgreement(
+uuid: UUID!
+): Response_Boolean
+
+Mutation.updateAgreementRight(
+input: UpdateAgreementRightInputInput
+uuid: UUID!
+): Response_AgreementRight
+
+Mutation.exerciseAgreementRight(
+exerciseEvidence: String
+uuid: UUID!
+): Response_AgreementRight
+
+Mutation.addRightToAgreement(
+input: CreateAgreementRightInputInput
+): Response_AgreementRight
+
+Query.expiringAgreementRights(
+daysAhead: Int = 30
+): Response_List_AgreementRight
+
+Query.unexercisedAgreementRights(
+agreementId: Long!
+): Response_List_AgreementRight
+
+Query.searchAgreementRights(
+size: Int
+enforcementStatus: String
+rightId: Long
+agreementId: Long
+sortBy: String
+page: Int
+isExercised: Boolean
+direction: String
+): Response_Page_AgreementRight
+
+Query.agreementRightsByAgreementId(
+agreementId: Long!
+): Response_List_AgreementRight
+
+Query.agreementRightByUuid(
+uuid: UUID!
+): Response_AgreementRight
+
+Query.agreementRightsByAgreementUuid(
+agreementUuid: UUID!
+): Response_List_AgreementRight
+

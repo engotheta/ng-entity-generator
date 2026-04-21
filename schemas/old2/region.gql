@@ -1,0 +1,32 @@
+type Region {
+code: String
+districts: [District]
+name: String
+napaId: Long
+}
+
+Query.getAllRegions: [Region]
+
+Query.getRegionObjectByUid(
+uid: String
+): Region
+
+type RegionDtoInput {
+code: String
+name: String
+uid: String
+}
+
+Mutation.saveOrUpdateRegion(
+region: RegionDtoInput
+): Response_Region
+
+Mutation.activateOrDeactivateRegion(
+uid: String
+): Response_Region
+
+Query.getRegionById(
+uid: String
+): Response_Region
+
+Query.getAllInActiveRegions: [Region]

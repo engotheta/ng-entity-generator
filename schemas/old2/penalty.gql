@@ -1,0 +1,53 @@
+type Penalty {
+active: Boolean!
+penaltyAmount: BigDecimal!
+penaltyCode: String!
+penaltyDescription: String!
+penaltyName: String!
+rightUuid: UUID!
+uuid: UUID
+}
+
+type PenaltyDtoInput {
+active: Boolean!
+penaltyAmount: BigDecimal!
+penaltyCode: String!
+penaltyDescription: String!
+penaltyName: String!
+rightUuid: UUID!
+uuid: UUID
+}
+
+type PenaltyResponse {
+active: Boolean
+id: Long
+penaltyAmount: BigDecimal
+penaltyCode: String
+penaltyDescription: String
+penaltyName: String
+uuid: UUID
+}
+
+Mutation.createOrUpdatePenalty(
+input: PenaltyDtoInput
+): Response_Penalty
+
+Mutation.changePenaltyStatus(
+uuid: UUID
+): Response_Boolean
+
+Mutation.deletePenalty(
+uuid: UUID
+): Response_Boolean
+
+Query.penaltySearch(
+pageNumber: Int = 0
+pageSize: Int = 10
+term: String
+): Response_Page_PenaltyResponse
+
+Query.findPenaltyByUid(
+uuid: UUID
+): Response_PenaltyResponse
+
+Query.findPenalities: Response_List_PenaltyResponse

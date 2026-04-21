@@ -1,0 +1,39 @@
+type PlantFormGroup {
+active: Boolean
+createdAt: LocalDateTime
+createdBy: User
+deletedAt: LocalDateTime
+deletedBy: Long
+id: Long
+isDeleted: Boolean
+migrated: Boolean
+name: String
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type PlantFormGroupDtoInput {
+name: String
+uid: String
+}
+
+Mutation.saveOrUpdatePlantFormGroup(
+plantFormGroup: PlantFormGroupDtoInput
+): Response_PlantFormGroup
+
+Mutation.activateOrDeactivatePlantFormGroup(
+uid: String
+): Response_PlantFormGroup
+
+Query.getPlantFormGroupObjectByUid(
+uid: String
+): PlantFormGroup
+
+Query.getAllPlantFormGroups: [PlantFormGroup]
+
+Query.getAllInActivePlantFormGroups: [PlantFormGroup]
+
+Query.getPlantFormGroupByUid(
+uid: String
+): Response_PlantFormGroup

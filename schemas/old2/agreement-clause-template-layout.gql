@@ -1,0 +1,24 @@
+type AgreementClauseTemplatesLayout {
+name: String!
+uid: UUID
+}
+
+type AgreementClauseTemplatesLayoutDtoInput {
+name: String!
+uid: UUID
+}
+
+Mutation.createAgreementClauseTemplatesLayout(
+layoutDto: AgreementClauseTemplatesLayoutDtoInput
+): Response_AgreementClauseTemplatesLayout
+
+Mutation.deleteAgreementClauseTemplatesLayout(
+uid: String
+): Response_Boolean
+
+Query.agreementClauseTemplatesLayout(
+uid: UUID
+): Response_AgreementClauseTemplatesLayout
+
+Query.agreementClauseTemplatesLayouts: [AgreementClauseTemplatesLayout]
+

@@ -1,0 +1,64 @@
+type Risk {
+active: Boolean
+description: String
+name: String
+right: Right
+riskScore: BigDecimal
+severity: String
+uuid: UUID
+}
+
+type RiskInputRequestInput {
+active: Boolean!
+description: String!
+name: String!
+rightUuid: UUID!
+riskScore: BigDecimal!
+severity: RiskSeverity!
+uuid: UUID
+}
+
+enum RiskSeverity {
+CRITICAL
+HIGH
+LOW
+MEDIUM
+VERY_LOW
+}
+
+
+type RiskFilterInput {
+active: Boolean
+direction: String
+isMitigated: Boolean
+likelihood: String
+page: Int
+riskOwnerId: Long
+severity: String
+size: Int
+sortBy: String
+term: String
+}
+
+
+Mutation.deleteRisk(
+uuid: UUID!
+): Response_Boolean
+
+Mutation.createOrUpdateRisk(
+input: RiskInputRequestInput
+): Response_Risk
+
+Query.searchRisks(
+filter: RiskFilterInput = {}
+): Response_Page_Risk
+
+Query.risks: Response_List_Risk
+
+Query.risksBySeverity(
+severity: String!
+): Response_List_Risk
+
+Query.riskByUuid(
+uuid: UUID!
+): Response_Risk

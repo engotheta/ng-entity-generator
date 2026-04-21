@@ -1,0 +1,54 @@
+type AgreementSignatory {
+code: String
+description: String
+id: Long
+name: String
+signedAt: Instant
+uuid: UUID
+witness: Boolean
+}
+
+
+type SignatoryDtoInput {
+agreementUuid: UUID!
+code: String!
+description: String!
+name: String!
+signedAt: Instant!
+uuid: UUID
+witness: Boolean!
+}
+
+type SignatoryFilterInput {
+code: String
+description: String
+name: String
+signedAt: Instant
+witness: Boolean
+}
+
+
+Mutation.deleteSignatory(
+uuid: UUID!
+): Response_Boolean
+
+Mutation.createOrUpdateSignatory(
+input: SignatoryDtoInput
+): Response_SignatoryDto
+
+Query.signatoryWitnesses: Response_List_AgreementSignatory
+
+Query.listSignatoryCreatedByUser(
+uuid: UUID!
+): Response_List_AgreementSignatory
+
+Query.signatorySearch(
+filter: SignatoryFilterInput = {}
+pagination: PaginationInput
+): PageResponse_AgreementSignatory
+
+Query.signatoryTenderers: Response_List_AgreementSignatory
+
+Query.agreementSignatory(
+agreementUuid: UUID
+): Response_List_AgreementSignatory

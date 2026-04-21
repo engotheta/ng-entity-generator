@@ -1,0 +1,32 @@
+type AgreementTemplatesLayout {
+isActive: Boolean
+name: String
+uid: UUID
+}
+
+type AgreementTemplatesLayoutDtoInput {
+isActive: Boolean
+name: String
+uid: UUID
+}
+
+Mutation.softDeleteAgreementTemplatesLayout(
+uid: UUID
+): Response_Boolean
+
+Query.agreementTemplatesLayout(
+uid: UUID
+): Response_AgreementTemplatesLayout
+
+Query.agreementTemplatesLayouts(
+sortDirection: String = "ASC"
+size: Int = 10
+sortBy: String = "name"
+page: Int = 0
+): Response_List_AgreementTemplatesLayout
+
+Mutation.hardDeleteUnusedLayouts: Response_Boolean
+
+Mutation.createTemplatesLayout(
+input: AgreementTemplatesLayoutDtoInput
+): Response_AgreementTemplatesLayout

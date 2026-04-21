@@ -1,0 +1,93 @@
+type Analysis {
+active: Boolean!
+agreementAnalysed: [AgreementAnalysis]
+analysed: String!
+analysedAt: OffsetDateTime!
+analysedBy: User!
+code: String!
+description: String!
+name: String!
+}
+
+type AgreementAnalysis {
+agreement: Agreement!
+analysed: Analysis!
+id: Long
+}
+
+type AnalysisDto {
+active: Boolean!
+analysed: String!
+code: String!
+description: String!
+id: Long
+name: String!
+uuid: UUID
+}
+
+type AnalysisDtoInput {
+active: Boolean!
+analysed: String!
+code: String!
+description: String!
+id: Long
+name: String!
+uuid: UUID
+}
+
+type AnalysisFilterInput {
+active: Boolean
+code: String
+name: String
+}
+
+type AnalysisResponse {
+active: Boolean
+analysed: String
+code: String
+description: String
+id: Long
+name: String
+uuid: UUID
+}
+
+Mutation.deleteAnalysed(
+uuid: UUID
+): Response_String
+
+Mutation.analysedChnageStatus(
+uuid: UUID
+): Response_AnalysisDto
+
+Mutation.createAnalysed(
+input: AnalysisDtoInput
+): Response_AnalysisDto
+
+Mutation.linkAnalysedToAgreement(
+agreementUuid: UUID
+analysedUuid: UUID
+): Response_String
+
+Query.getAnalysedByUuid(
+uuid: UUID
+): Response_AnalysisDto
+
+Mutation.addAnalysisToAgreement(
+agreementUuid: UUID
+input: AnalysisDtoInput
+): Response_AnalysisDto
+
+Query.findAgreementAnalysis(
+uuid: UUID
+): Response_List_AnalysisDto
+
+Query.listOfAnalysisByUserId(
+userId: Long
+): Response_List_AnalysisResponse
+
+Query.analysisListSearch(
+filter: AnalysedFilterInput = {}
+pagination: PaginationInput
+): PageResponse_AnalysisDto
+
+Query.findAllAnalysis: Response_List_AnalysisDto

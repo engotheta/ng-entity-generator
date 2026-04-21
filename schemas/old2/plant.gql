@@ -1,0 +1,48 @@
+type Plant {
+active: Boolean
+blockNumber: String
+code: String!
+createdAt: LocalDateTime
+createdBy: User
+dailyProductionCapacityMmscfd: BigDecimal
+deletedAt: LocalDateTime
+deletedBy: Long
+id: Long
+isDeleted: Boolean
+migrated: Boolean
+name: String!
+physicalAddress: String
+postalAddress: String
+subWard: SubWard
+supervisorUser: User
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type PlantDtoInput {
+blockNumber: String
+code: String!
+dailyProductionCapacityMmscfd: BigDecimal!
+name: String!
+physicalAddress: String
+postalAddress: String
+subWardUid: String
+supervisorUserUid: String
+uid: String
+}
+
+Mutation.savePlant(
+input: PlantDtoInput!
+): Response_Plant
+
+Query.allPlant: [Plant]
+
+Query.allPlantPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_Plant
+
+Query.findPlant(
+uid: String!
+): Response_Plant

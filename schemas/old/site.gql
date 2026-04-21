@@ -1,0 +1,79 @@
+type Site {
+active: Boolean!
+agreementSites: [AgreementSite]
+code: String!
+description: String!
+name: String!
+}
+
+type SiteResponse {
+active: Boolean
+code: String
+description: String
+id: Long
+name: String
+uuid: UUID
+}
+ 
+type SitesDtoInput {
+active: Boolean!
+code: String!
+description: String!
+name: String!
+}
+
+type SitesFilterInput {
+active: Boolean
+code: String
+name: String
+}
+
+Mutation.changeSiteStatus(
+uuid: UUID
+status: String
+): Response_String
+
+Mutation.addSiteToAgreement(
+agreementUuid: UUID
+input: SitesDtoInput
+): Response_SitesDto
+
+Mutation.removeSiteFromAgreement(
+agreementUuid: UUID
+siteUuid: UUID
+): Response_String
+
+Mutation.updateSite(
+input: SitesDtoInput
+uuid: UUID
+): Response_SitesDto
+
+Mutation.deleteSite(
+uuid: UUID
+): Response_String
+
+Mutation.linkSiteToAgreement(
+agreementUuid: UUID
+siteUuid: UUID
+): Response_String
+
+Mutation.createSite(
+input: SitesDtoInput
+): Response_SitesDto
+
+Query.getAllSiteByUserId(
+userId: Long
+): Response_List_SiteResponse
+
+Query.siteListSearch(
+filter: SitesFilterInput = {}
+pagination: PaginationInput
+): PageResponse_SiteResponse
+
+Query.findSiteByUid(
+uuid: UUID
+): Response_SiteResponse
+
+Query.findAgreementSite(
+agreementUuid: UUID
+): Response_List_SiteResponse

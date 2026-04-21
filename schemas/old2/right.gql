@@ -1,0 +1,59 @@
+type Right {
+active: Boolean
+clause: Long
+createdAt: LocalDateTime
+createdBy: Long
+description: String
+id: Long
+name: String
+parent: Right
+type: ModelType
+updatedAt: LocalDateTime
+updatedBy: Long
+uuid: UUID
+}
+
+ 
+enum ModelType {
+OBLIGATIONS
+RIGHTS
+}
+
+type RightDtoInput {
+active: Boolean!
+clauseUuid: UUID
+description: String!
+name: String!
+parentUuid: UUID
+type: ModelType!
+uuid: UUID
+}
+
+
+Mutation.createRights(
+input: RightDtoInput
+): Response_Right
+
+Mutation.changeRightStatus(
+uuid: UUID
+): Response_String
+
+Mutation.deleteRights(
+uuid: UUID
+): Response_String
+
+Query.searchRights(
+pageNumber: Int = 0
+pageSize: Int = 10
+term: String
+): Response_Page_Right
+
+Query.findRightById(
+uuid: UUID
+): Response_Right
+
+Query.findAllRights: [Right]
+Query.findAllRightsOrObligations(
+modelType: ModelType
+): [Right]
+

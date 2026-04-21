@@ -1,0 +1,43 @@
+type PlantFormItem {
+active: Boolean
+createdAt: LocalDateTime
+createdBy: User
+deletedAt: LocalDateTime
+deletedBy: Long
+group: PlantFormGroup
+id: Long
+inputType: PlantInputType
+isDeleted: Boolean
+migrated: Boolean
+name: String
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type PlantFormItemDtoInput {
+groupUid: String
+inputType: PlantInputType
+name: String
+uid: String
+}
+
+Mutation.saveOrUpdatePlantFormItem(
+plantFormItem: PlantFormItemDtoInput
+): Response_PlantFormItem
+
+Mutation.activateOrDeactivatePlantFormItem(
+uid: String
+): Response_PlantFormItem
+
+Query.getPlantFormItemByUid(
+uid: String
+): Response_PlantFormItem
+
+Query.getPlantFormItemObjectByUid(
+uid: String
+): PlantFormItem
+
+Query.getAllInActivePlantFormItems: [PlantFormItem]
+
+Query.getAllPlantFormItems: [PlantFormItem]

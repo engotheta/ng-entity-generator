@@ -1,0 +1,33 @@
+type AgreementSectionDatum {
+agreementSection: AgreementSection!
+agreementSectionUid: UUID!
+description: String!
+name: String!
+uid: UUID
+}
+
+type AgreementSectionDatumDtoInput {
+agreementSection: AgreementSectionDtoInput!
+agreementSectionUid: UUID!
+description: String!
+name: String!
+uid: UUID
+}
+
+Mutation.deleteAgreementSectionDatum(
+uid: UUID
+): Response_Boolean
+
+Mutation.createAgreementSectionDatum(
+input: AgreementSectionDatumDtoInput
+): Response_AgreementSectionDatum
+
+Query.agreementSectionData: [AgreementSectionDatum]
+
+Query.agreementSectionDataByAgreementSection(
+agreementSectionUid: UUID
+): [AgreementSectionDatum]
+
+Query.agreementSectionDatum(
+uid: UUID
+): Response_AgreementSectionDatum

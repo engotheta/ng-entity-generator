@@ -1,0 +1,37 @@
+type LayoutSection {
+hasClause: Boolean!
+name: String!
+uid: UUID
+}
+
+type LayoutSectionDtoInput {
+hasClause: Boolean!
+name: String!
+uid: UUID
+}
+
+Mutation.createLayoutSection(
+LayoutSectionDto: LayoutSectionDtoInput
+): Response_LayoutSection
+
+Mutation.removeClauseFromSection(
+layoutSectionUid: UUID
+clauseUid: UUID
+): Response_Boolean
+
+Mutation.deleteLayoutSection(
+uid: UUID
+): Response_Boolean
+
+Query.sectionTemplatesByLayoutSection(
+layoutSectionUid: UUID
+): [AgreementSectionClauseTemplateDto]
+
+Query.findLayoutSectionByUid(
+uid: UUID
+): Response_LayoutSection
+
+Query.findAllLayoutSections: [LayoutSection]
+
+
+ 

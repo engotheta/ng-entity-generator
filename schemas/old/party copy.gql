@@ -1,0 +1,137 @@
+
+
+
+type AgreementsIndividualResponse {
+active: Boolean
+email: String
+fullName: String
+phoneNumber: String
+role: String
+uuid: UUID
+}
+
+type IndividualResponse {
+active: Boolean
+email: String
+fullName: String
+phoneNumber: String
+userUuid: UUID
+uuid: UUID
+}
+
+type AgreementIndividualCreateDtoInput {
+agreementUuid: UUID!
+individualUuid: UUID!
+role: String!
+}
+
+Mutation.addIndividualPartyToAgreement(
+input: AgreementIndividualCreateDtoInput
+): Response_String
+
+Query.listAllIndividuals: Response_List_IndividualResponse
+
+Query.agreementIndividualParty(
+agreementUuid: UUID
+): Response_List_AgreementsIndividualResponse
+
+
+Mutation.removeIndividualPartyFromAgreement(
+agreementUuid: UUID
+individualUuid: UUID
+): Response_String
+
+-----------------------------------------------------------------------
+
+Mutation.addCountryToAgreement(
+input: AgreementCountryCreateDtoInput
+): Response_String
+
+type AgreementCountryCreateDtoInput {
+agreementUuid: UUID!
+countryUuid: UUID!
+role: String!
+}
+
+Mutation.removeCountryPartyFromAgreement(
+agreementUuid: UUID
+countryUuid: UUID
+): Response_String
+
+Query.agreementCountries(
+agreementUuid: UUID
+): Response_List_AgreementsCountryResponse
+
+type AgreementsCountryResponse {
+countryCode: String
+countryName: String
+countryUuid: UUID
+role: String
+}
+
+Query.searchCountry(
+filter: CountryFilterInput
+pagination: PaginationInput
+): Response_Page_CountryResponse
+
+type CountryResponse {
+active: Boolean
+code: String
+name: String
+uuid: UUID
+}
+
+----------------------------------------------------------------------
+
+Mutation.addInstitutionPartyToAgreement(
+input: AgreementInstitutionCreateDtoInput
+): Response_String
+
+type AgreementInstitutionCreateDtoInput {
+agreementUuid: UUID!
+institutionUuid: UUID!
+role: String!
+}
+
+Mutation.removeInstitutionalPartyFromAgreement(
+agreementUuid: UUID
+institutionalUuid: UUID
+): Response_String
+
+Query.agreementInstitutionParty(
+agreementUuid: UUID
+): Response_List_AgreementsInstitutionResponse
+
+type AgreementsInstitutionResponse {
+active: Boolean
+address: String
+code: String
+description: String
+email: String
+is_law_firm: Boolean
+is_public_institution: Boolean
+name: String
+phone: String
+role: String
+uuid: UUID
+}
+
+type InstitutionResponse {
+active: Boolean
+address: String
+code: String
+description: String
+email: String
+fax: String
+id: Long
+lawFirm: Boolean
+name: String
+phone: String
+publicInstitution: Boolean
+typeCode: String
+typeName: String
+uuid: UUID
+website: String
+}
+
+Query.institutions: [InstitutionResponse]

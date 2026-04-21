@@ -1,0 +1,80 @@
+type RightMilestoneDatum {
+active: Boolean
+clauseRightsDatumDto: ClauseRightsDatumDto
+clauseRightsDatumUid: UUID
+createdAt: LocalDateTime
+createdBy: Long
+dueDate: LocalDate
+milestoneDto: MilestoneDto
+milestoneUid: UUID
+progress: Float
+status: ProcessStatus
+updatedAt: LocalDateTime
+updatedBy: Long
+uuid: UUID
+}
+
+type RightMilestoneDatumRequestInput {
+clauseRightsDatumUid: String
+dueDate: LocalDate
+milestoneUid: String
+progress: Float
+status: String
+uid: UUID
+}
+
+Mutation.softDeleteRightMilestoneData(
+uuid: UUID
+): Response_Boolean
+
+Mutation.updateRightMilestoneDataProgress(
+progress: Float
+uuid: UUID
+): Response_RightMilestoneDatum
+
+Mutation.deleteRightMilestoneData(
+uuid: UUID
+): Response_Boolean
+
+Mutation.createRightMilestoneData(
+rightMilestoneDataRequest: RightMilestoneDatumRequestInput
+): Response_RightMilestoneDatum
+
+Query.getRightMilestonesByClauseRights(
+clauseRightsUuid: UUID
+): Response_List_RightMilestoneDatum
+
+Query.listAllRightMilestones: Response_List_RightMilestoneDatum
+
+Query.getRightMilestonesByMilestone(
+milestoneUuid: UUID
+): Response_List_RightMilestoneDatum
+
+Query.getRightMilestonesByStatus(
+sortDirection: String = "ASC"
+size: Int = 10
+sortBy: String = "dueDate"
+page: Int = 0
+status: ProcessStatus
+): Response_Page_RightMilestoneDatum
+
+Query.getRightMilestonesByDueDateRange(
+endDate: LocalDate
+startDate: LocalDate
+): Response_List_RightMilestoneDatum
+
+Query.getRightMilestonesByProgressRange(
+maxProgress: Float = 100
+minProgress: Float = 0
+): Response_List_RightMilestoneDatum
+
+Query.getRightMilestoneByUuid(
+uuid: UUID
+): Response_RightMilestoneDatum
+
+Query.getAllRightMilestones(
+sortDirection: String = "DESC"
+size: Int = 10
+sortBy: String = "id"
+page: Int = 0
+): Response_Page_RightMilestoneDatum
