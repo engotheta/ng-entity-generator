@@ -492,7 +492,7 @@ class EntityGenerator {
       String: "FieldType.input",
       Int: "FieldType.input",
       Long: "FieldType.number",
-      Float: "FieldType.number",
+      Float: "FieldType.decimal",
       Boolean: "FieldType.checkbox",
       LocalDateTime: "FieldType.datetime",
       BigDecimal: "FieldType.number",
@@ -1023,7 +1023,7 @@ class EntityGenerator {
 
       ctypes.forEach((type) => {
         if (content.includes(type) && !imports.includes(type)) {
-          imports += `import { ${type} } from '@shared/utilities/data.gql';\n`;
+          imports += `import { ${type} } from '@shared/fetch/graphql.constants';\n`;
         }
       });
 
@@ -1051,7 +1051,7 @@ class EntityGenerator {
 
     let imports = "";
     imports += `import { Component, OnInit } from '@angular/core';\n`;
-    imports += `import { PageHeaderComponent } from '@shared/page-header.component';\n`;
+    imports += `import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';\n`;
     imports += `import { BaseComponent } from '@shared/components/base-componet/base-component';\n`;
     imports += `import { DataGridComponent } from '@shared/components/data-grid/data-grid.component';\n`;
     imports += `import { ActionButton } from '@shared/components/action-buttons/action-buttons.inteface';\n`;
@@ -1418,15 +1418,14 @@ class EntityGenerator {
 
     //prettier-ignore
 
-    imports += `import { Component OnInit } from "@angular/core";\n`;
+    imports += `import { Component, OnInit } from "@angular/core";\n`;
     imports += `import { CommonModule } from "@angular/common";\n`;
-    imports += `import { PageHeaderComponent } from "@shared/page-header.component";\n`;
-
+    imports += `import { PageHeaderComponent } from "@shared/components/page-header/page-header.component";\n`;
     imports += `import { BaseComponent } from "@shared/components/base-componet/base-component";\n`;
-    imports += `import { ContentParameter } from "@shared/components/contents-view/view.interface";\n`;
-    imports += `import { FetchParameter } from '@shared/services/fetch.service';\n`;
+    imports += `import { ContentParameter } from "@shared/components/view-component/view-interface";\n`;
+    imports += `import { FetchParameter } from "@shared/fetch/fetch.interface";\n`;
     imports += `import { ActionButton } from "@shared/components/action-buttons/action-buttons.inteface";\n`;
-    imports += `import { ContentsViewComponent } from "@shared/components/contents-view/contents-view.component";\n`;
+    imports += `import { ContentsViewComponent } from "@shared/components/view-component/contents-view/contents-view.component";\n`;
 
     imports += `\n`;
     imports += `import { ${entityName} } from "./${kebabName}.interface";\n`;
@@ -1694,7 +1693,7 @@ function main() {
 // Module exports
 //prettier-ignore
 function generateFromString(schema, outputDir = ".", entityName, projectAppPath ) {
-  if(!projectAppPath) projectAppPath= "X:/Work/WorkY/Apps/LSMIS/lsmis-frontend/src/app";
+  if(!projectAppPath) projectAppPath= "X:/Work/WorkY/Apps/GASCO/gasco-frontend/src/app";
   ALL_TYPES = analyzeStoreTypes(projectAppPath);
   // console.log(ALL_TYPES);
 

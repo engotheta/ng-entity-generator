@@ -1437,7 +1437,7 @@ class EntityGenerator {
 
     let content = "";
     content += `@Component({\n`;
-    content += `  selector: 'app-${kebabName}.',\n`;
+    content += `  selector: 'app-${kebabName}',\n`;
     content += `  imports: [CommonModule, PageHeaderComponent, ContentsViewComponent ${!arrayFields.length ? ",ToObservablePipe" : ""}],\n`;
     content += "  template: `\n";
     content += `    <!--  -->\n`;

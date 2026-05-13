@@ -1,0 +1,104 @@
+type Inquiry {
+active: Boolean
+attendee: User
+clientName: String
+closedBy: User
+createdAt: LocalDateTime
+createdBy: User
+createdById: Long
+deletedAt: LocalDateTime
+deletedBy: Long
+deletedId: Long
+description: String
+destination: InquiryNature
+district: District
+followupInquiry: Inquiry
+id: Long
+inquiryCategory: InquiryCategory
+isDeleted: Boolean
+migrated: Boolean
+nature: InquiryNature
+phone: String
+priority: InquiryPriority
+region: Region
+status: InquiryStatus
+subWard: SubWard
+trackingId: String
+type: InquiryType
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+ward: Ward
+}
+
+type InquiryDtoInput {
+attachments: [AttachmentDtoInput]
+clientName: String
+description: String
+destination: InquiryNature
+inquiryCategory: InquiryCategory
+nature: InquiryNature
+phone: String
+priority: InquiryPriority
+subWardUid: String
+trackingId: String
+type: InquiryType
+uid: String
+}
+
+enum InquiryNature {
+BILLING
+COMPLIMENT
+CUSTOMER_SERVICE
+OTHER
+SAFETY
+SECURITY
+SUGGESTION
+SUPPLY
+TECHNICAL
+}
+
+enum InquiryCategory {
+CNG
+COMMUNITY
+HOUSEHOLD
+INDUSTRY
+INSTITUTION
+PLANT
+}
+
+enum InquiryPriority {
+HIGH
+MEDIUM
+NORMAL
+}
+
+enum InquiryStatus {
+CLOSED
+OPEN
+}
+
+enum InquiryType {
+COMPLAINT
+FEEDBACK
+}
+
+Mutation.saveOrUpdateInquiry(
+inquiryDto: InquiryDtoInput
+): Response_Inquiry
+
+Query.allInquiriesPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_Inquiry
+
+Query.getInquiries: [Inquiry]
+
+Query.getInquiryByUid(
+uid: String
+): Response_Inquiry
+
+Query.closeInquiry(
+uid: String
+): Response_Inquiry
+

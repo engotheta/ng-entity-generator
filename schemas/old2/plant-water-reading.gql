@@ -1,0 +1,40 @@
+type PlantWaterReading {
+active: Boolean
+createdAt: LocalDateTime
+createdBy: User
+createdById: Long
+deletedAt: LocalDateTime
+deletedBy: Long
+deletedId: Long
+id: Long
+isDeleted: Boolean
+migrated: Boolean
+plant: Plant
+producedCondensate: Float
+producedWater: Float
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+waterDewPoint: Float
+}
+
+type PlantWaterReadingDtoInput {
+plantUid: String
+producedCondensate: Float
+producedWater: Float
+uid: String
+waterDewPoint: Float
+}
+
+Mutation.savePlantWaterReading(
+input: PlantWaterReadingDtoInput!
+): Response_PlantWaterReading
+
+Query.allPlantWaterReadingPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_PlantWaterReading
+
+Query.findPlantWaterReading(
+uid: String!
+): Response_PlantWaterReading

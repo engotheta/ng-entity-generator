@@ -1,0 +1,38 @@
+type AgreementMilestoneChallenge {
+agreementMonitoringProgress: AgreementMonitoringProgress
+createdAt: LocalDate
+description: String
+rightMilestoneData: RightMilestoneDatum
+uuid: UUID
+}
+
+type AgreementMilestoneChallengeRequestInput {
+agreementMonitoringProgressUid: UUID!
+description: String!
+rightMilestoneDataUid: UUID!
+uuid: UUID
+}
+
+Mutation.restoreAgreementMilestoneChallenge(
+uuid: UUID
+): Response_AgreementMilestoneChallenge
+
+Mutation.createAgreementMilestoneChallenge(
+input: AgreementMilestoneChallengeRequestInput
+): Response_AgreementMilestoneChallenge
+
+Mutation.deleteAgreementMilestoneChallenge(
+uuid: UUID
+): Response_Void
+
+Query.agreementMilestoneChallengeList(
+sortDirection: String = "DESC"
+search: String = ""
+size: Int = 10
+sortBy: String = "createdAt"
+page: Int = 0
+): Page_AgreementMilestoneChallenge
+
+Query.findAgreementMilestoneChallengeByUid(
+uuid: UUID
+): Response_AgreementMilestoneChallenge

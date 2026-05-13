@@ -1,0 +1,53 @@
+
+type PlantReceivedData {
+active: Boolean
+availableCapacity: Float
+client: Client
+createdAt: LocalDateTime
+createdBy: User
+createdById: Long
+deletedAt: LocalDateTime
+deletedBy: Long
+deletedId: Long
+flaredGas: Float
+id: Long
+isDeleted: Boolean
+migrated: Boolean
+ownUseGas: Float
+plant: Plant
+producedGas: Float
+receivedRawGasPressure: Float
+receivedRawGasTemperature: Float
+receivedRawGasVolume: Float
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+utilizedCapacity: Float
+}
+
+type PlantReceivedDataDtoInput {
+availableCapacity: Float
+clientUid: String
+flaredGas: Float
+ownUseGas: Float
+plantUid: String
+producedGas: Float
+receivedRawGasPressure: Float
+receivedRawGasTemperature: Float
+receivedRawGasVolume: Float
+uid: String
+utilizedCapacity: Float
+}
+
+Mutation.savePlantProcessingData(
+input: PlantReceivedDataDtoInput!
+): Response_PlantReceivedData
+
+Query.findPlantProcessingData(
+uid: String!
+): Response_PlantReceivedData
+
+Query.allPlantProcessingDataPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_PlantReceivedData

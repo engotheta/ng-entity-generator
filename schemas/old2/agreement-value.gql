@@ -1,0 +1,75 @@
+type AgreementValue {
+agreementDTO: AgreementDTO
+agreementUuid: UUID
+createdAt: LocalDateTime
+createdBy: Long
+currencyDTO: CurrencyDTO
+currencyUuid: UUID
+exchangeRate: BigDecimal
+exchangeRateDate: LocalDate
+uuid: UUID
+valueVatExclusive: BigDecimal
+valueVatInclusive: BigDecimal
+}
+
+type CurrencyDTO {
+active: Boolean
+code: String
+isDefault: Boolean
+name: String
+uuid: UUID
+}
+
+type AgreementValueDTOInput {
+agreementDTO: AgreementDTOInput
+agreementUuid: UUID
+createdAt: LocalDateTime
+createdBy: Long
+currencyDTO: CurrencyDTOInput
+currencyUuid: UUID
+exchangeRate: BigDecimal
+exchangeRateDate: LocalDate
+uuid: UUID
+valueVatExclusive: BigDecimal
+valueVatInclusive: BigDecimal
+}
+
+Mutation.deleteAgreementValue(
+uuid: UUID!
+): Response_Boolean
+
+Mutation.saveAgreementValue(
+input: AgreementValueDTOInput!
+): Response_AgreementValue
+
+Query.getAgreementValueByUuid(
+uuid: UUID!
+): Response_AgreementValue
+
+Query.getAgreementValuesByDateRange(
+endDate: String!
+startDate: String!
+): Response_List_AgreementValue
+
+Query.getAgreementValuesByAgreement(
+agreementUuid: UUID!
+): Response_List_AgreementValue
+
+Query.getAgreementValueById(
+id: Long!
+): Response_AgreementValue
+
+Query.getAllAgreementValues(
+sortDirection: String
+size: Int
+sortBy: String
+page: Int
+): Response_Page_AgreementValue
+
+Query.getAgreementValuesByCurrency(
+currencyUuid: UUID!
+): Response_List_AgreementValue
+
+Query.calculateTotalValueByAgreement(
+agreementUuid: UUID!
+): Response_String

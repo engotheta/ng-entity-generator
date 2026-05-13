@@ -1,0 +1,60 @@
+type AgreementMonitoringProgress {
+actualProgress: BigDecimal
+createdAt: LocalDateTime
+createdBy: User
+deletedBy: User
+implementationDate: LocalDate
+remarks: String
+rightMilestoneData: RightMilestoneDatum
+updatedAt: LocalDateTime
+updatedBy: User
+uuid: UUID
+}
+
+type AgreementMonitoringProgressRequestInput {
+implementationDate: LocalDate!
+progressPercent: BigDecimal!
+remarks: String!
+rightMilestoneDataUId: UUID!
+uuid: UUID
+}
+
+Mutation.restoreAgreementMonitoring(
+uuid: UUID
+): Response_AgreementMonitoringProgress
+
+Mutation.createAgreementMonitoring(
+input: AgreementMonitoringProgressRequestInput
+): Response_AgreementMonitoringProgress
+
+Mutation.deleteAgreementMonitoring(
+uuid: UUID
+): Response_Void
+
+Query.listAgreementMonitoringProgressByAgreement(
+sortDirection: String = "DESC"
+size: Int = 10
+agreementUid: UUID
+sortBy: String = "createdAt"
+page: Int = 0
+): Page_AgreementMonitoringProgress
+
+Query.findChallengesByAgreementMonitoringProgress(
+agreementMonitoringProgressUid: UUID
+): Response_List_AgreementMilestoneChallengeResponse
+
+Query.listAgreementMonitoringByRightDataUid(
+rightMilestoneDataUid: UUID
+): Response_List_AgreementMonitoringProgress
+
+Query.agreementMonitoringList(
+sortDirection: String = "DESC"
+search: String = ""
+size: Int = 10
+sortBy: String = "createdAt"
+page: Int = 0
+): Page_AgreementMonitoringProgress
+
+Query.findAgreementMonitoringByUid(
+agreementMonitoringUid: UUID
+): Response_AgreementMonitoringProgress

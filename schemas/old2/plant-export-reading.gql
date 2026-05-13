@@ -1,0 +1,42 @@
+type PlantExportReading {
+active: Boolean
+createdAt: LocalDateTime
+createdBy: User
+createdById: Long
+deletedAt: LocalDateTime
+deletedBy: Long
+deletedId: Long
+exportedGas: Float
+id: Long
+isDeleted: Boolean
+migrated: Boolean
+pipelineExportFlowRate: Float
+pipelineExportPressure: Float
+pipelineExportTemperature: Float
+plant: Plant
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type PlantExportReadingDtoInput {
+exportedGas: Float
+pipelineExportFlowRate: Float
+pipelineExportPressure: Float
+pipelineExportTemperature: Float
+plantUid: String
+uid: String
+}
+
+Mutation.savePlantExportReading(
+input: PlantExportReadingDtoInput!
+): Response_PlantExportReading
+
+Query.findPlantExportReading(
+uid: String!
+): Response_PlantExportReading
+
+Query.allPlantExportReadingPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_PlantExportReading
