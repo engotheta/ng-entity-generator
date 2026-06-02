@@ -7,12 +7,12 @@ import { FetchParameter } from "@shared/fetch/fetch.interface";
 import { ActionButton } from "@shared/components/action-buttons/action-buttons.inteface";
 import { ContentsViewComponent } from "@shared/components/view-component/contents-view/contents-view.component";
 
-import { Inquiry } from "./inquiry.interface";
-import { GET_INQUIRY_REPLIES } from "./inquiry.graphql";
-import { inquiryUpsertBtn, inquiry$ } from "./forms/inquiry.form";
+import { Department } from "./department.interface";
+import { FIND_DEPARTMENT } from "./department.graphql";
+import { departmentUpsertBtn, department$ } from "./department.form";
 
 @Component({
-  selector: 'app-inquiry.',
+  selector: 'app-department.',
   imports: [CommonModule, PageHeaderComponent, ContentsViewComponent ],
   template: `
     <!--  -->
@@ -21,41 +21,41 @@ import { inquiryUpsertBtn, inquiry$ } from "./forms/inquiry.form";
         [title]="title"
         [subtitle]="subtitle"
         [actionButtons]="actionButtons"
-        [data]="inquiry"
+        [data]="department"
       />
       <contents-view class="block grow" [contents]="contents" />
     </div>
    `
 })
-export class InquiryComponent extends BaseComponent implements OnInit {
-  override title = 'Inquiry';
-  override subtitle = 'Inquiry Management';
+export class DepartmentComponent extends BaseComponent implements OnInit {
+  override title = 'Department';
+  override subtitle = 'Department Management';
 
-  inquiry: Inquiry | undefined;
+  department: Department | undefined;
   override contents: ContentParameter[] = [];
-  override actionButtons: ActionButton[] = [inquiryUpsertBtn(this)];
+  override actionButtons: ActionButton[] = [departmentUpsertBtn(this)];
 
   fetchParameter: FetchParameter = {
     loadingOn: 'no-content',
-    query: GET_INQUIRY_REPLIES,
+    query: FIND_DEPARTMENT,
     successFn:(res) => this.title = res?.data?.name,
-    variables: { uid:this.route.snapshot?.paramMap?.get('inquiryUid')},
+    variables: { uid:this.route.snapshot?.paramMap?.get('departmentUid')},
   };
 
   async ngOnInit(): Promise<void> {
     await this.setContents();
-    this.subs.add(inquiry$.subscribe(() => this.setContents()));
+    this.subs.add(department$.subscribe(() => this.setContents()));
   }
 
   async setContents() {
-    this.inquiry = await this.fs.fetch(this.fetchParameter);
+    this.department = await this.fs.fetch(this.fetchParameter);
 
     this.contents = [
       {
         type: 'details',
         icon: 'notes',
         showUndefined: true,
-        entity: this.inquiry,
+        entity: this.department,
         fetchParameter: this.fetchParameter,
       },
     ];

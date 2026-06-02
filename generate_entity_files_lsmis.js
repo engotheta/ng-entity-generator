@@ -3,7 +3,10 @@ import * as fs from "fs";
 // import { generateFromString } from "./generator/entity_generator_gasco.js";
 import { generateFromString } from "./generator/entity_generator_lsmis.js";
 
-let schemas = ["schemas/agreement-value.gql"];
+let schemas = [
+  "schemas/agreement-monitoring.gql",
+  "schemas/milestone-challange.gql",
+];
 
 schemas.forEach((src) => {
   console.log(`Generating files for ${src} ...`);

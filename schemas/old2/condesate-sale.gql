@@ -1,0 +1,75 @@
+type CondensateSale {
+active: Boolean
+approvedAt: LocalDateTime
+approvedBy: User
+comment: String
+createdAt: LocalDateTime
+createdBy: User
+createdById: Long
+customerLicenseNumber: String
+customerName: String
+deletedAt: LocalDateTime
+deletedBy: Long
+deletedId: Long
+id: Long
+isDeleted: Boolean
+migrated: Boolean
+offloadingDate: LocalDate
+plant: Plant
+remarks: String
+salesDate: LocalDate
+submittedAt: LocalDateTime
+truckNumber: String
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+volumeInLitres: Float
+}
+
+type CondensateSaleDtoInput {
+customerLicenseNumber: String!
+customerName: String!
+offloadingDate: LocalDate!
+plantUid: String!
+remarks: String
+salesDate: LocalDate!
+truckNumber: String!
+uid: String
+volumeInLitres: Float!
+}
+
+Mutation.deleteCondensateSale(
+uid: String!
+): Response_CondensateSale
+
+Mutation.approveCondensateSale(
+uid: String!
+comment: String!
+): Response_CondensateSale
+
+Mutation.updateCondensateSale(
+input: CondensateSaleDtoInput!
+): Response_CondensateSale
+
+Mutation.submitCondensateSale(
+uid: String!
+): Response_CondensateSale
+
+Mutation.createCondensateSale(
+input: CondensateSaleDtoInput!
+): Response_CondensateSale
+
+Query.getAllCondensateSalesPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_CondensateSale
+
+Query.getCondensateSaleByUid(
+uid: String!
+): Response_CondensateSale
+
+Query.getCondensateSalesByPlant(
+pageableParam: PageableParamInput
+active: Boolean
+plantUid: String!
+): Page_CondensateSale

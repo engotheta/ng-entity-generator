@@ -5,12 +5,12 @@ import { DataGridComponent } from '@shared/components/data-grid/data-grid.compon
 import { ActionButton } from '@shared/components/action-buttons/action-buttons.inteface';
 import { GridParameter, GridKeyColumn } from '@shared/components/data-grid/data-grid.interfaces';
 
-import { SUBMITTED_INQUIRIES_PAGEABLE } from './inquiry.graphql';
-import { inquiryUpsertBtn } from './forms/inquiry.form';
-import { inquiryTableBtns, inquiry$ } from './forms/inquiry.form';
+import { MY_CASE_REGISTRATIONS_PAGEABLE } from './case-registration.graphql';
+import { caseRegistrationUpsertBtn } from './case-registration.form';
+import { caseRegistrationTableBtns, caseRegistration$ } from './case-registration.form';
 
 @Component({
-  selector: 'app-inquiries',
+  selector: 'app-case-registrations',
   imports: [DataGridComponent, PageHeaderComponent],
   template: ` 
     <div class="size-full flex-1 flex flex-col gap-3 ">
@@ -19,20 +19,20 @@ import { inquiryTableBtns, inquiry$ } from './forms/inquiry.form';
     </div>
   `,
 })
-export class InquiriesComponent extends BaseComponent {
-  override title: string = 'Inquiries Management';
-  override subtitle: string = 'Inquiries List';
-  override actionButtons: ActionButton[] = [inquiryUpsertBtn(this)];
+export class CaseRegistrationsComponent extends BaseComponent {
+  override title: string = 'Case Registrations Management';
+  override subtitle: string = 'Case Registrations List';
+  override actionButtons: ActionButton[] = [caseRegistrationUpsertBtn(this)];
 
-  keyColumns: GridKeyColumn[] = ['index',, 'actions'];
+  keyColumns: GridKeyColumn[] = ['index','name', 'amount', 'dateOfSchedules', 'decistion', 'natureOfCase', 'place', 'actions'];
 
   gridParameter: GridParameter = {
      title: this.route.snapshot.data['name'],
      icon: this.route.snapshot.data['icon'],
      keyColumns: this.keyColumns,
-     actionButtons: inquiryTableBtns(this),
-     reloadActions$: [inquiry$],
-     fetchParameter: { query: SUBMITTED_INQUIRIES_PAGEABLE },
+     actionButtons: caseRegistrationTableBtns(this),
+     reloadActions$: [caseRegistration$],
+     fetchParameter: { query: MY_CASE_REGISTRATIONS_PAGEABLE },
    };
 
 }

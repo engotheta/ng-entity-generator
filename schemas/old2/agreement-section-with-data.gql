@@ -1,0 +1,63 @@
+type AgreementSectionWithDataDTOInput {
+agreementSectionDatumUid: UUID
+agreementSectionUid: UUID
+agreementUid: UUID!
+createdAt: LocalDateTime
+createdBy: String
+description: String!
+generatedAgreementSectionDatumUid: UUID
+generatedAgreementSectionUid: UUID
+generatedLayoutSectionUid: UUID
+hasClause: Boolean!
+layoutSectionName: String!
+layoutSectionUid: UUID
+message: String
+name: String!
+updatedAt: LocalDateTime
+updatedBy: String
+}
+
+type AgreementSectionWithDataDTO {
+agreementSectionDatumUid: UUID
+agreementSectionUid: UUID
+agreementUid: UUID!
+createdAt: LocalDateTime
+createdBy: String
+description: String!
+generatedAgreementSectionDatumUid: UUID
+generatedAgreementSectionUid: UUID
+generatedLayoutSectionUid: UUID
+hasClause: Boolean!
+layoutSectionName: String!
+layoutSectionUid: UUID
+message: String
+name: String!
+updatedAt: LocalDateTime
+updatedBy: String
+}
+
+type LayoutSection {
+hasClause: Boolean!
+name: String!
+}
+
+Mutation.processAgreementSectionWithData(
+input: AgreementSectionWithDataDTOInput
+): Response_AgreementSectionWithDataDTO
+
+Mutation.deleteAgreementSection(
+agreementSectionDatumUid: UUID
+agreementSectionUid: UUID
+): Response_Boolean
+
+Query.getAgreementSectionByUid(
+agreementSectionUid: UUID
+): Response_AgreementSectionWithDataDTO
+
+Query.getAgreementSectionsByAgreementUid(
+agreementUid: UUID
+): Response_List_AgreementSectionWithDataDTO
+
+Query.getAllLayoutSections: Response_List_LayoutSection
+
+

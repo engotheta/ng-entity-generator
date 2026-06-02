@@ -1,0 +1,56 @@
+
+
+type ContractRegistration {
+active: Boolean
+amount: Float
+contractDate: LocalDate
+contractManager: String
+contractNumber: String
+contractType: ContractType
+createdAt: LocalDateTime
+createdBy: User
+deletedAt: LocalDateTime
+deletedBy: Long
+department: Department
+duration: Int
+endDate: LocalDate
+executionStatus: ContractExecutionStatus
+id: Long
+isDeleted: Boolean
+migrated: Boolean
+name: String
+serviceProvider: String
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+enum ContractExecutionStatus {
+ACTIVE
+EXPIRED
+}
+
+enum ContractType {
+ADDENDUM
+MoU
+NON_PROCUREMENT
+PROCUREMENT
+}
+
+
+Mutation.saveOrUpdateContractRegistration(
+contractRegistrationDto: ContractRegistrationDtoInput
+): Response_ContractRegistration
+
+Query.allContractRegistrationsPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_ContractRegistration
+
+Query.getContractRegistrationByUid(
+uid: String
+): Response_ContractRegistration
+
+Query.myContractRegistrationsPageable(
+pageableParam: PageableParamInput
+): Page_ContractRegistration

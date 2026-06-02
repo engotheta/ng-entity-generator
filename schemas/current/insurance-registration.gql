@@ -1,0 +1,58 @@
+type InsuranceRegistration {
+active: Boolean
+coverage: String
+createdAt: LocalDateTime
+createdBy: User
+deletedAt: LocalDateTime
+deletedBy: Long
+department: Department
+duration: Int
+endDate: LocalDate
+id: Long
+insuranceType: InsuranceType
+isDeleted: Boolean
+migrated: Boolean
+nameOfAsset: String
+startDate: LocalDate
+statusOfIncident: String
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+value: Float
+}
+
+type InsuranceRegistrationDtoInput {
+attachments: [AttachmentDtoInput]
+coverage: String
+duration: Int
+endDate: LocalDate
+insuranceType: InsuranceType
+nameOfAsset: String
+startDate: LocalDate
+statusOfIncident: String
+uid: String
+value: Float
+}
+
+enum InsuranceType {
+COMPREHENSIVE
+THIRD_PART
+}
+
+
+Mutation.saveOrUpdateInsuranceRegistration(
+insuranceRegistrationDto: InsuranceRegistrationDtoInput
+): Response_InsuranceRegistration
+
+Query.allInsuranceRegistrationsPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_InsuranceRegistration
+
+Query.myInsuranceRegistrationsPageable(
+pageableParam: PageableParamInput
+): Page_InsuranceRegistration
+
+Query.getInsuranceRegistrationByUid(
+uid: String
+): Response_InsuranceRegistration

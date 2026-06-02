@@ -1,0 +1,40 @@
+type Department {
+active: Boolean
+code: String!
+createdAt: LocalDateTime
+createdBy: User
+deletedAt: LocalDateTime
+deletedBy: Long
+id: Long
+isDeleted: Boolean
+migrated: Boolean
+name: String!
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type DepartmentDtoInput {
+code: String!
+name: String!
+uid: String
+}
+
+Mutation.deleteDepartment(
+uid: String
+): Response_Department
+
+Mutation.saveDepartment(
+dto: DepartmentDtoInput
+): Response_Department
+
+Query.findDepartment(
+uid: String
+): Response_Department
+
+Query.allDepartmentsPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_Department
+
+Query.allDepartments: [Department]

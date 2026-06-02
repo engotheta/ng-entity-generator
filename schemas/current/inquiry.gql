@@ -1,0 +1,75 @@
+type Inquiry {
+active: Boolean
+ uid:string
+}
+
+
+type AssignmentDtoInput {
+assignedTo: String
+comment: String
+uid: String
+}
+
+type InquiryAssignment {
+active: Boolean
+assignedBy: User
+assignee: User
+comment: String
+createdAt: LocalDateTime
+createdBy: User
+current: Boolean
+deletedAt: LocalDateTime
+deletedBy: Long
+id: Long
+inquiry: Inquiry
+isDeleted: Boolean
+migrated: Boolean
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type AttendInquiryDtoInput {
+attachmentDtos: [AttachmentDtoInput]
+comment: String
+uid: String
+}
+ 
+type InquiryReply {
+active: Boolean
+attendee: User
+comment: String
+createdAt: LocalDateTime
+createdBy: User
+deletedAt: LocalDateTime
+deletedBy: Long
+id: Long
+inquiry: Inquiry
+isDeleted: Boolean
+migrated: Boolean
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+
+Mutation.assignInquiry(
+assignmentDto: AssignmentDtoInput
+): Response_Inquiry
+
+Query.myInquiryAssignmentPageable(
+pageableParam: PageableParamInput
+): Page_InquiryAssignment
+
+Query.submittedInquiriesPageable(
+pageableParam: PageableParamInput
+): Page_Inquiry
+
+Mutation.attendInquiry(
+attendInquiryDto: AttendInquiryDtoInput
+): Response_Inquiry
+
+Query.getInquiryReplies(
+uid: String
+): [InquiryReply]
+

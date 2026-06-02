@@ -1,0 +1,73 @@
+type RightWithHierarchyDTO {
+active: Boolean
+children: [RightWithHierarchyDTO]
+childrenCount: Int
+clauseUid: UUID!
+createdAt: LocalDateTime
+createdBy: String
+description: String!
+generatedRightUid: UUID
+message: String
+name: String!
+parentRightName: String
+parentRightUid: UUID
+rightUid: UUID
+type: ModelType!
+updatedAt: LocalDateTime
+updatedBy: String
+}
+
+type RightWithHierarchyDTOInput {
+active: Boolean
+children: [RightWithHierarchyDTOInput]
+childrenCount: Int
+clauseUid: UUID!
+createdAt: LocalDateTime
+createdBy: String
+description: String!
+generatedRightUid: UUID
+message: String
+name: String!
+parentRightName: String
+parentRightUid: UUID
+rightUid: UUID
+type: ModelType!
+updatedAt: LocalDateTime
+updatedBy: String
+}
+
+Mutation.processRightWithHierarchy(
+rightWithHierarchyDTO: RightWithHierarchyDTOInput
+): Response_RightWithHierarchyDTO
+
+Mutation.deleteRightWithDescendants(
+rightUid: UUID
+): Response_Boolean
+
+Mutation.moveRight(
+rightUid: UUID
+newParentUid: UUID
+): Response_RightWithHierarchyDTO
+
+Mutation.batchCreateRights(
+rightDtoList: [RightWithHierarchyDTOInput]
+): Response_List_RightWithHierarchyDTO
+
+
+Query.getRightWithHierarchy(
+rightUid: UUID
+): Response_RightWithHierarchyDTO
+
+Query.getRightsByClauseUid(
+clauseUid: UUID
+): Response_List_RightWithHierarchyDTO
+
+Query.getRightsByType(
+type: ModelType
+): Response_List_RightWithHierarchyDTO
+
+Query.getRightsHierarchyTree(
+clauseUid: UUID
+): Response_List_RightWithHierarchyDTO
+
+

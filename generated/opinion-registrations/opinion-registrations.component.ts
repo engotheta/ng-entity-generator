@@ -5,12 +5,12 @@ import { DataGridComponent } from '@shared/components/data-grid/data-grid.compon
 import { ActionButton } from '@shared/components/action-buttons/action-buttons.inteface';
 import { GridParameter, GridKeyColumn } from '@shared/components/data-grid/data-grid.interfaces';
 
-import { SUBMITTED_INQUIRIES_PAGEABLE } from './inquiry.graphql';
-import { inquiryUpsertBtn } from './forms/inquiry.form';
-import { inquiryTableBtns, inquiry$ } from './forms/inquiry.form';
+import { MY_OPINION_REGISTRATIONS_PAGEABLE } from './opinion-registration.graphql';
+import { opinionRegistrationUpsertBtn } from './opinion-registration.form';
+import { opinionRegistrationTableBtns, opinionRegistration$ } from './opinion-registration.form';
 
 @Component({
-  selector: 'app-inquiries',
+  selector: 'app-opinion-registrations',
   imports: [DataGridComponent, PageHeaderComponent],
   template: ` 
     <div class="size-full flex-1 flex flex-col gap-3 ">
@@ -19,20 +19,20 @@ import { inquiryTableBtns, inquiry$ } from './forms/inquiry.form';
     </div>
   `,
 })
-export class InquiriesComponent extends BaseComponent {
-  override title: string = 'Inquiries Management';
-  override subtitle: string = 'Inquiries List';
-  override actionButtons: ActionButton[] = [inquiryUpsertBtn(this)];
+export class OpinionRegistrationsComponent extends BaseComponent {
+  override title: string = 'Opinion Registrations Management';
+  override subtitle: string = 'Opinion Registrations List';
+  override actionButtons: ActionButton[] = [opinionRegistrationUpsertBtn(this)];
 
-  keyColumns: GridKeyColumn[] = ['index',, 'actions'];
+  keyColumns: GridKeyColumn[] = ['index','name', 'nature', 'responsibleUnit', 'valueObtained', 'actions'];
 
   gridParameter: GridParameter = {
      title: this.route.snapshot.data['name'],
      icon: this.route.snapshot.data['icon'],
      keyColumns: this.keyColumns,
-     actionButtons: inquiryTableBtns(this),
-     reloadActions$: [inquiry$],
-     fetchParameter: { query: SUBMITTED_INQUIRIES_PAGEABLE },
+     actionButtons: opinionRegistrationTableBtns(this),
+     reloadActions$: [opinionRegistration$],
+     fetchParameter: { query: MY_OPINION_REGISTRATIONS_PAGEABLE },
    };
 
 }

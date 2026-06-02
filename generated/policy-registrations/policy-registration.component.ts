@@ -7,12 +7,12 @@ import { FetchParameter } from "@shared/fetch/fetch.interface";
 import { ActionButton } from "@shared/components/action-buttons/action-buttons.inteface";
 import { ContentsViewComponent } from "@shared/components/view-component/contents-view/contents-view.component";
 
-import { Inquiry } from "./inquiry.interface";
-import { GET_INQUIRY_REPLIES } from "./inquiry.graphql";
-import { inquiryUpsertBtn, inquiry$ } from "./forms/inquiry.form";
+import { PolicyRegistration } from "./policy-registration.interface";
+import { GET_POLICY_REGISTRATION_BY_UID } from "./policy-registration.graphql";
+import { policyRegistrationUpsertBtn, policyRegistration$ } from "./policy-registration.form";
 
 @Component({
-  selector: 'app-inquiry.',
+  selector: 'app-policy-registration.',
   imports: [CommonModule, PageHeaderComponent, ContentsViewComponent ],
   template: `
     <!--  -->
@@ -21,41 +21,41 @@ import { inquiryUpsertBtn, inquiry$ } from "./forms/inquiry.form";
         [title]="title"
         [subtitle]="subtitle"
         [actionButtons]="actionButtons"
-        [data]="inquiry"
+        [data]="policyRegistration"
       />
       <contents-view class="block grow" [contents]="contents" />
     </div>
    `
 })
-export class InquiryComponent extends BaseComponent implements OnInit {
-  override title = 'Inquiry';
-  override subtitle = 'Inquiry Management';
+export class PolicyRegistrationComponent extends BaseComponent implements OnInit {
+  override title = 'Policy Registration';
+  override subtitle = 'Policy Registration Management';
 
-  inquiry: Inquiry | undefined;
+  policyRegistration: PolicyRegistration | undefined;
   override contents: ContentParameter[] = [];
-  override actionButtons: ActionButton[] = [inquiryUpsertBtn(this)];
+  override actionButtons: ActionButton[] = [policyRegistrationUpsertBtn(this)];
 
   fetchParameter: FetchParameter = {
     loadingOn: 'no-content',
-    query: GET_INQUIRY_REPLIES,
+    query: GET_POLICY_REGISTRATION_BY_UID,
     successFn:(res) => this.title = res?.data?.name,
-    variables: { uid:this.route.snapshot?.paramMap?.get('inquiryUid')},
+    variables: { uid:this.route.snapshot?.paramMap?.get('policyRegistrationUid')},
   };
 
   async ngOnInit(): Promise<void> {
     await this.setContents();
-    this.subs.add(inquiry$.subscribe(() => this.setContents()));
+    this.subs.add(policyRegistration$.subscribe(() => this.setContents()));
   }
 
   async setContents() {
-    this.inquiry = await this.fs.fetch(this.fetchParameter);
+    this.policyRegistration = await this.fs.fetch(this.fetchParameter);
 
     this.contents = [
       {
         type: 'details',
         icon: 'notes',
         showUndefined: true,
-        entity: this.inquiry,
+        entity: this.policyRegistration,
         fetchParameter: this.fetchParameter,
       },
     ];

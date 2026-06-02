@@ -1,0 +1,78 @@
+type MilestoneWithDataDTO {
+active: Boolean
+clauseRightsSpecificationUid: UUID!
+createdAt: LocalDateTime
+createdBy: String
+description: String!
+dueDate: LocalDate!
+errorMessage: String
+generatedMilestoneDataUid: UUID
+generatedMilestoneUid: UUID
+isMeasured: Boolean!
+message: String
+milestoneDataUid: UUID
+milestoneUid: UUID
+name: String!
+operationSuccess: Boolean
+paymentInvolved: Boolean!
+progress: Float!
+rightUid: UUID!
+status: ProcessStatus!
+updatedAt: LocalDateTime
+updatedBy: String
+}
+
+type MilestoneWithDataDTOInput {
+active: Boolean
+clauseRightsSpecificationUid: UUID!
+createdAt: LocalDateTime
+createdBy: String
+description: String!
+dueDate: LocalDate!
+errorMessage: String
+generatedMilestoneDataUid: UUID
+generatedMilestoneUid: UUID
+isMeasured: Boolean!
+message: String
+milestoneDataUid: UUID
+milestoneUid: UUID
+name: String!
+operationSuccess: Boolean
+paymentInvolved: Boolean!
+progress: Float!
+rightUid: UUID!
+status: ProcessStatus!
+updatedAt: LocalDateTime
+updatedBy: String
+}
+
+enum ProcessStatus {
+CANCELLED
+COMPLETED
+INPROGRESS
+OVERDUE
+PENDING
+}
+
+Mutation.processMilestoneWithData(
+milestoneWithDataDTO: MilestoneWithDataDTOInput
+): Response_MilestoneWithDataDTO
+
+Mutation.updateMilestoneProgress(
+progress: Float
+milestoneDataUid: UUID
+): Response_MilestoneWithDataDTO
+
+Mutation.deleteMilestoneWithData(
+milestoneDataUid: UUID
+milestoneUid: UUID
+): Response_Boolean
+
+Query.getMilestoneWithDataByMilestoneUid(
+milestoneUid: UUID
+): Response_MilestoneWithDataDTO
+
+Query.getMilestonesByRightUid(
+rightUid: UUID
+): Response_List_MilestoneWithDataDTO
+

@@ -1100,219 +1100,18 @@ class EntityGenerator {
     return imports + `\n` + content;
   }
 
-  _getRelativeImportPrefix(inFormsFolder = false) {
-    return inFormsFolder ? "../" : "./";
-  }
-
-  _isDtoParam(param, types) {
-    if (!param?.type) return false;
-    if (this._isGqlType(param.type)) return false;
-
-    const foundType =
-      types.find((t) => t.name === param.type) ??
-      ALL_TYPES.find((t) => t.name === param.type);
-
-    if (foundType?.isEnum) return false;
-
-    return (
-      !!foundType ||
-      ["dto", "input"].some((s) => param.type.toLowerCase().includes(s))
-    );
-  }
-
-  _getMutationDtoParams(operation, types) {
-    return operation?.params?.filter((p) => this._isDtoParam(p, types)) ?? [];
-  }
-
-  _mutationHasDtoInput(operation, types) {
-    return this._getMutationDtoParams(operation, types).length > 0;
-  }
-
-  _getCrudOperationNames(entityName, operations) {
-    return [
-      this._getCreateOperation(entityName, operations)?.name,
-      this._getUpdateOperation(entityName, operations)?.name,
-      this._getDeleteOperation(entityName, operations)?.name,
-    ].filter(Boolean);
-  }
-
-  _isCrudMutation(entityName, operations, operation) {
-    return this._getCrudOperationNames(entityName, operations).includes(
-      operation?.name,
-    );
-  }
-
-  _getAdditionalMutationOperations(entityName, operations) {
-    return operations.filter(
-      (op) =>
-        op.type === "Mutation" &&
-        !this._isCrudMutation(entityName, operations, op),
-    );
-  }
-
-  _getOperationVariablesObject(
-    operation,
-    idKey = "uid",
-    dtoValueName = "value",
-  ) {
-    return operation?.params
-      ?.map((p) => {
-        if (!this._isGqlType(p.type)) return `${p.name}: ${dtoValueName}`;
-
-        if (
-          ["id", "uid", "uuid"].some((s) => p.name.toLowerCase().endsWith(s))
-        ) {
-          return `${p.name}: data?.${idKey} ?? data?.${p.name}`;
-        }
-
-        return `${p.name}: value?.${p.name} ?? data?.${p.name}`;
-      })
-      .join(", ");
-  }
-
-  _getOperationPlainVariablesObject(operation, idKey = "uid") {
-    return operation?.params
-      ?.map((p) => {
-        if (
-          ["id", "uid", "uuid"].some((s) => p.name.toLowerCase().endsWith(s))
-        ) {
-          return `${p.name}: data?.${idKey} ?? data?.${p.name}`;
-        }
-
-        return `${p.name}: data?.${p.name}`;
-      })
-      .join(", ");
-  }
-
-  generateMutationFormFile(
-    entityName,
-    operation,
-    operations,
-    types,
-    inFormsFolder = true,
-  ) {
-    const kebabName = this._toKebab(entityName);
-    const camelName = this._toCamelCase(entityName);
-    const titleName = this._toTitleCase(entityName);
-    const opCamel = this._toCamelCase(operation.name);
-    const opTitle = this._toTitleCase(operation.name);
-    const opName = this._toScreamingSnake(operation.name);
-    const importPrefix = this._getRelativeImportPrefix(inFormsFolder);
-
-    const mainType = types.find((t) => t.name === entityName);
-    const idKey =
-      mainType?.fields.find(
-        (f) => !!["uuid", "uid"].find((s) => f.name.toLowerCase() === s),
-      )?.name ?? "uid";
-
-    let imports = "";
-    let content = "";
-
-    imports += `import { FormComponent } from '@shared/components/generic-form/form.component';\n`;
-    imports += `import { FormParameters } from '@shared/components/generic-form/form.interface';\n`;
-    imports += `import { BaseComponent } from '@shared/components/base-componet/base-component';\n`;
-    imports += `import { VALIDATOR_REQUIRED } from '@shared/components/generic-form/form-constants';\n`;
-    imports += `import { FieldConfig, FieldType } from '@shared/components/generic-form/field.interface';\n`;
-    imports += `import { ActionButton } from '@shared/components/action-buttons/action-buttons.inteface';\n`;
-    imports += `\n`;
-    imports += `import { ${opName} } from '${importPrefix}${kebabName}.graphql';\n`;
-    imports += `import { ${entityName} } from '${importPrefix}${kebabName}.interface';\n`;
-    imports += `import { ${camelName}$ } from './${kebabName}.form';\n`;
-
-    const dtoParams = this._getMutationDtoParams(operation, types);
-    const dtoFields = dtoParams.flatMap((param) => {
-      const dtoType = this._getDtoType(types, param.type, true);
-      return dtoType?.fields ?? [];
-    });
-
-    content += `export const get${this._toTitleCase(operation.name).replace(/\s+/g, "")}FormFields = (comp: BaseComponent): FieldConfig[] => [\n`;
-
-    const fieldsContents = this.getFormFieldsContents(
-      dtoFields,
-      types,
-      entityName,
-    );
-
-    content += fieldsContents[0];
-    imports += fieldsContents[1];
-
-    content += `];\n\n`;
-
-    content += `export function ${opCamel}Btn(comp: BaseComponent): ActionButton {\n`;
-    content += `  return {\n`;
-    content += `    label: '${opTitle}',\n`;
-    content += `    icon: 'flash',\n`;
-    content += `    click: (data?: ${entityName}) => {\n`;
-    content += `      const formParameter: FormParameters = {\n`;
-    content += `        model: { ...data },\n`;
-    content += `        title: '${opTitle}',\n`;
-    content += `        fields: get${this._toTitleCase(operation.name).replace(/\s+/g, "")}FormFields(comp),\n`;
-    content += `        closeAction$: ${camelName}$,\n`;
-    content += `        onSubmit: async (value: any) => {\n`;
-    content += `          await comp.fs.fetch({\n`;
-    content += `            notify: true,\n`;
-    content += `            variables: { ${this._getOperationVariablesObject(operation, idKey, "value")} },\n`;
-    content += `            mutation: ${opName},\n`;
-    content += `            successFn: (res) => ${camelName}$.next(res?.data),\n`;
-    content += `          });\n`;
-    content += `        },\n`;
-    content += `      };\n\n`;
-    content += `      comp.vs?.openModal(FormComponent, formParameter, '96%');\n`;
-    content += `    },\n`;
-    content += `    permissions: [],\n`;
-    content += `  };\n`;
-    content += `}\n`;
-
-    return imports + "\n" + content;
-  }
-
-  _generatePlainMutationBtn(entityName, operation, operations, types) {
-    const camelName = this._toCamelCase(entityName);
-    const opCamel = this._toCamelCase(operation.name);
-    const opTitle = this._toTitleCase(operation.name);
-    const opName = this._toScreamingSnake(operation.name);
-
-    const mainType = types.find((t) => t.name === entityName);
-    const idKey =
-      mainType?.fields.find(
-        (f) => !!["uuid", "uid"].find((s) => f.name.toLowerCase() === s),
-      )?.name ?? "uid";
-
-    let content = "";
-    content += `export function ${opCamel}Btn(comp: BaseComponent): ActionButton {\n`;
-    content += `  return {\n`;
-    content += `    label: '${opTitle}',\n`;
-    content += `    icon: 'flash',\n`;
-    content += `    click: async (data: ${entityName}) => {\n`;
-    content += `      await comp.fs.fetch({\n`;
-    content += `        notify: true,\n`;
-    content += `        loadingOn: 'content',\n`;
-    content += `        variables: { ${this._getOperationPlainVariablesObject(operation, idKey)} },\n`;
-    content += `        mutation: ${opName},\n`;
-    content += `        successFn: (res) => ${camelName}$.next(res?.data),\n`;
-    content += `      });\n`;
-    content += `    },\n`;
-    content += `    permissions: [],\n`;
-    content += `  };\n`;
-    content += `}\n\n`;
-
-    return content;
-  }
-
-  generateFormFile(
-    entityName,
-    operations,
-    types,
-    plainMutationOperations = [],
-    inFormsFolder = false,
-  ) {
+  generateFormFile(entityName, operations, types) {
     const kebabName = this._toKebab(entityName);
     const kebabPlural = this._toPlural(kebabName);
     const camelName = this._toCamelCase(entityName);
     const titleName = this._toTitleCase(entityName);
-    const importPrefix = this._getRelativeImportPrefix(inFormsFolder);
 
     const inputType = this._getDtoTypeByEntityName(types, entityName, true);
+
+    // console.log(
+    //   "----------------------------input--------type-------",
+    //   inputType,
+    // );
 
     const mainType = types.find((t) => t.name === entityName);
 
@@ -1344,18 +1143,13 @@ class EntityGenerator {
     imports += `import { ActionButton } from '@shared/components/action-buttons/action-buttons.inteface';\n`;
     imports += `\n`;
 
-    const mutationImports = [
-      createOperationName,
-      deleteOperationName,
-      updateOperationName,
-      ...plainMutationOperations.map((op) => this._toScreamingSnake(op.name)),
-    ]
-      .filter(Boolean)
-      .filter((value, index, arr) => arr.indexOf(value) === index)
-      .join(", ");
+    imports += `import { ${createOperationName}, ${deleteOperationName} } from './${kebabName}.graphql';\n`;
 
-    imports += `import { ${mutationImports} } from '${importPrefix}${kebabName}.graphql';\n`;
-    imports += `import { ${entityName} } from '${importPrefix}${kebabName}.interface';\n`;
+    if (updateOperationName) {
+      imports += `import { ${updateOperationName}  } from './${kebabName}.graphql';\n`;
+    }
+
+    imports += `import { ${entityName} } from './${kebabName}.interface';\n`;
 
     //////////////
     content += `//Listener for all ${entityName} actions \n`;
@@ -1452,7 +1246,7 @@ class EntityGenerator {
     content += `        loadingOn: 'content',\n`;
     content += `        variables: {${varsProps}},\n`;
     content += `        mutation: ${deleteOperationName},\n`;
-    content += `        successFn: (res) => ${camelName}$.next(res?.data),\n`;
+    content += `        finalFn: (res) => ${camelName}$.next(res?.data),\n`;
     content += `      });\n`;
     content += `    },\n`;
     content += `    ...getDeleteBtnProps('${titleName}', '${nameKeys[0] ?? "name"}'),\n`;
@@ -1460,15 +1254,6 @@ class EntityGenerator {
     content += `  };\n`;
     content += `}\n`;
     content += `\n`;
-
-    plainMutationOperations.forEach((op) => {
-      content += this._generatePlainMutationBtn(
-        entityName,
-        op,
-        operations,
-        types,
-      );
-    });
 
     content += `export function ${camelName}TableBtns(comp: BaseComponent):ActionButton[] {\n`;
     content += `  return  [\n`;
@@ -1478,9 +1263,6 @@ class EntityGenerator {
     content += `        ${camelName}ViewBtn(comp),\n`;
     content += `        ${camelName}UpsertBtn(comp),\n`;
     content += `        ${camelName}DeleteBtn(comp),\n`;
-    plainMutationOperations.forEach((op) => {
-      content += `        ${this._toCamelCase(op.name)}Btn(comp),\n`;
-    });
     content += `      ],\n`;
     content += `    },\n`;
     content += `  ];\n`;
@@ -1575,8 +1357,8 @@ class EntityGenerator {
 
         //prettier-ignore
         let nameKeys =  typeDetails?.fields
-            ?.filter( (f) =>  ["string", "number"].includes(f.type) && this._isNameKey(f.name))
-            .map( f => f.name)
+          ?.filter( (f) =>  ["string", "number"].includes(f.type) && this._isNameKey(f.name))
+          .map( f => f.name)
 
         let nameKeysStr = nameKeys?.map((k) => `"${k}"`).join(", ");
 
@@ -1604,8 +1386,8 @@ class EntityGenerator {
       fieldContent += `    validations: ${field.required ? '[VALIDATOR_REQUIRED]':'[]'},\n`;
       // prettier-ignore
       if(fulls.some(s => inputType_?.includes(s) ) || (fields.length <= 4 && !fieldContentExtra.includes('visible: false'))){
-          fieldContent += `    class: "col-span-full",\n`;
-        }
+        fieldContent += `    class: "col-span-full",\n`;
+      }
 
       fieldContent += fieldContentExtra;
       fieldContent += innerfieldContent;
@@ -1845,103 +1627,20 @@ class EntityGenerator {
     const kebabPlural = this._toPlural(kebabName);
     const entityDir = path.join(outputDir, `${kebabPlural}`);
 
-    const additionalMutations = this._getAdditionalMutationOperations(
-      entityName,
-      operations,
-    );
-    const dtoFormMutations = additionalMutations.filter((op) =>
-      this._mutationHasDtoInput(op, modTypes),
-    );
-    const plainMutations = additionalMutations.filter(
-      (op) => !this._mutationHasDtoInput(op, modTypes),
-    );
-
-    // If any additional DTO-based mutation form exists, keep every .form.ts under /forms.
-    const useFormsFolder = dtoFormMutations.length > 0;
-    const formsDir = path.join(entityDir, "forms");
-    const mainFormImportPath = useFormsFolder
-      ? `./forms/${kebabName}.form`
-      : `./${kebabName}.form`;
-
-    let entityComponent = this.generateEntityComp(
-      entityName,
-      operations,
-      modTypes,
-    );
-    let entityListComponent = this.generateEntityListComp(
-      entityName,
-      operations,
-      modTypes,
-    );
-
-    if (useFormsFolder) {
-      entityComponent = entityComponent.replaceAll(
-        `"./${kebabName}.form"`,
-        `"${mainFormImportPath}"`,
-      );
-      entityComponent = entityComponent.replaceAll(
-        `'./${kebabName}.form'`,
-        `'${mainFormImportPath}'`,
-      );
-      entityListComponent = entityListComponent.replaceAll(
-        `"./${kebabName}.form"`,
-        `"${mainFormImportPath}"`,
-      );
-      entityListComponent = entityListComponent.replaceAll(
-        `'./${kebabName}.form'`,
-        `'${mainFormImportPath}'`,
-      );
-    }
-
     const entityFiles = {
       //prettier-ignore
       [`${kebabName}.graphql.ts`]: this.generateGraphqlFile( entityName, operations, modTypes ),
       //prettier-ignore
-      [`${kebabName}.component.ts`]: entityComponent,
+      [`${kebabName}.form.ts`]: this.generateFormFile(entityName,operations, modTypes  ),
       //prettier-ignore
-      [`${kebabPlural}.component.ts`]: entityListComponent,
+      [`${kebabName}.component.ts`]: this.generateEntityComp(entityName, operations, modTypes ),
+      //prettier-ignore
+      [`${kebabPlural}.component.ts`]: this.generateEntityListComp(entityName, operations, modTypes ),
       //prettier-ignore
       [`${kebabName}.interface.ts`]: this.generateInterfaceFile(entityName, modTypes),
     };
 
-    if (!useFormsFolder) {
-      entityFiles[`${kebabName}.form.ts`] = this.generateFormFile(
-        entityName,
-        operations,
-        modTypes,
-        plainMutations,
-        false,
-      );
-    }
-
-    const formFiles = {};
-
-    if (useFormsFolder) {
-      formFiles[`${kebabName}.form.ts`] = this.generateFormFile(
-        entityName,
-        operations,
-        modTypes,
-        plainMutations,
-        true,
-      );
-
-      dtoFormMutations.forEach((op) => {
-        formFiles[`${this._toKebab(op.name)}.form.ts`] =
-          this.generateMutationFormFile(
-            entityName,
-            op,
-            operations,
-            modTypes,
-            true,
-          );
-      });
-    }
-
     const fileDirs = [{ dir: entityDir, files: entityFiles }];
-
-    if (useFormsFolder) {
-      fileDirs.push({ dir: formsDir, files: formFiles });
-    }
 
     // Ensure output directory exists
     [outputDir, ...fileDirs.map((f) => f.dir)].forEach((dir) => {

@@ -1,102 +1,120 @@
 import { baseGqlFields } from '@shared/utilities/data.gql';
 import { gql } from '@apollo/client/core';
 import { responseGqlFields } from '@shared/utilities/data.gql';
-import { pageGqlFields } from '@shared/utilities/data.gql';
+import { pageGqlFields } from '@shared/fetch/graphql.constants';
 
-export const inquiryGqlFields = `
+export const inquiryAssignmentGqlFields = `
   active
-  attendee{
+  assignedBy{
+    name
     fullName
+    firstName
+    lastName
+    middleName
     username
-    activationExpires
-    activationToken
-    alternativePhone
-    email
   }
-  clientName
-  closedBy{
+  assignee{
+    name
     fullName
+    firstName
+    lastName
+    middleName
     username
-    activationExpires
-    activationToken
-    alternativePhone
-    email
   }
+  comment
   createdAt
   createdBy{
+    name
     fullName
+    firstName
+    lastName
+    middleName
     username
-    activationExpires
-    activationToken
-    alternativePhone
-    email
   }
-  createdById
+  current
   deletedAt
   deletedBy
-  deletedId
-  description
-  destination
-  followupInquiry{
-    clientName
-    description
-    phone
-    trackingId
-  }
   id
-  inquiryCategory
   isDeleted
   migrated
-  nature
-  phone
-  priority
-  status
-  trackingId
-  type
   uid
   updatedAt
   updatedBy
 `;
 
+export const inquiryReplyGqlFields = `
+  active
+  attendee{
+    name
+    fullName
+    firstName
+    lastName
+    middleName
+    username
+  }
+  comment
+  createdAt
+  createdBy{
+    name
+    fullName
+    firstName
+    lastName
+    middleName
+    username
+  }
+  deletedAt
+  deletedBy
+  id
+  isDeleted
+  migrated
+  uid
+  updatedAt
+  updatedBy
+`;
+
+export const inquiryGqlFields = `
+  active
+`;
+
 //   
 //  Mutations
-export const SAVE_OR_UPDATE_INQUIRY = gql`
-  mutation saveOrUpdateInquiry($inquiryDto: InquiryDtoInput){
-   saveOrUpdateInquiry(inquiryDto: $inquiryDto) {
+export const ASSIGN_INQUIRY = gql`
+  mutation assignInquiry($assignmentDto: AssignmentDtoInput){
+   assignInquiry(assignmentDto: $assignmentDto) {
+      ${responseGqlFields(inquiryGqlFields)}
+    }
+  }
+ `;
+
+export const ATTEND_INQUIRY = gql`
+  mutation attendInquiry($attendInquiryDto: AttendInquiryDtoInput){
+   attendInquiry(attendInquiryDto: $attendInquiryDto) {
       ${responseGqlFields(inquiryGqlFields)}
     }
   }
  `;
 
 //  Queries
-export const ALL_INQUIRIES_PAGEABLE = gql`
-  query allInquiriesPageable($pageableParam: PageableParamInput, $active: Boolean){
-   allInquiriesPageable(pageableParam: $pageableParam, active: $active) {
+export const MY_INQUIRY_ASSIGNMENT_PAGEABLE = gql`
+  query myInquiryAssignmentPageable($pageableParam: PageableParamInput){
+   myInquiryAssignmentPageable(pageableParam: $pageableParam) {
+      ${pageGqlFields(inquiryAssignmentGqlFields)}
+    }
+  }
+ `;
+
+export const SUBMITTED_INQUIRIES_PAGEABLE = gql`
+  query submittedInquiriesPageable($pageableParam: PageableParamInput){
+   submittedInquiriesPageable(pageableParam: $pageableParam) {
       ${pageGqlFields(inquiryGqlFields)}
     }
   }
  `;
 
-export const GET_INQUIRIES = gql`
-  query getInquiries{
-   getInquiries {
-      ${inquiryGqlFields}
-    }
-  }
- `;
-
-export const GET_INQUIRY_BY_UID = gql`
-  query getInquiryByUid($uid: String){
-   getInquiryByUid(uid: $uid) {
-      ${responseGqlFields(inquiryGqlFields)}
-    }
-  }
- `;
-
-export const CLOSE_INQUIRY = gql`
-  query closeInquiry($uid: String){
-   closeInquiry(uid: $uid) {
-      ${responseGqlFields(inquiryGqlFields)}
+export const GET_INQUIRY_REPLIES = gql`
+  query getInquiryReplies($uid: String){
+   getInquiryReplies(uid: $uid) {
+      ${inquiryReplyGqlFields}
     }
   }
  `;

@@ -1,0 +1,59 @@
+type MeetingRegistration {
+active: Boolean
+category: MeetingCategory
+conductedDate: LocalDate
+confirmationDate: LocalDate
+createdAt: LocalDateTime
+createdBy: User
+deletedAt: LocalDateTime
+deletedBy: Long
+id: Long
+isDeleted: Boolean
+migrated: Boolean
+minuteStatus: MinuteStatus
+name: String
+uid: String
+upcomingSchedule: LocalDate
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type MeetingRegistrationDtoInput {
+attachments: [AttachmentDtoInput]
+category: MeetingCategory
+conductedDate: LocalDate
+confirmationDate: LocalDate
+minuteStatus: MinuteStatus
+name: String
+uid: String
+upcomingSchedule: LocalDate
+}
+
+enum MinuteStatus {
+APPROVED
+DRAFT
+}
+
+enum MeetingCategory {
+AGM
+EXTRAORDINARY
+ORDINARY
+}
+
+Mutation.saveOrUpdateMeetingRegistration(
+meetingRegistrationDto: MeetingRegistrationDtoInput
+): Response_MeetingRegistration
+
+Query.allMeetingRegistrationsPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_MeetingRegistration
+
+Query.myMeetingRegistrationsPageable(
+pageableParam: PageableParamInput
+): Page_MeetingRegistration
+
+Query.getMeetingRegistrationByUid(
+uid: String
+): Response_MeetingRegistration
+

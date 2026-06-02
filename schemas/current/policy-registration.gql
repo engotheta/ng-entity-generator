@@ -1,0 +1,63 @@
+
+
+type PolicyRegistration {
+active: Boolean
+applicability: PolicyApplicability
+createdAt: LocalDateTime
+createdBy: User
+dateOfReview: LocalDate
+deletedAt: LocalDateTime
+deletedBy: Long
+department: Department
+endorsementDate: LocalDate
+expirationDate: LocalDate
+id: Long
+isDeleted: Boolean
+migrated: Boolean
+name: String
+reviewStatus: PolicyReviewStatus
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type PolicyRegistrationDtoInput {
+applicability: PolicyApplicability
+attachments: [AttachmentDtoInput]
+dateOfReview: LocalDate
+departmentUid: Long
+endorsementDate: LocalDate
+expirationDate: LocalDate
+name: String
+reviewStatus: PolicyReviewStatus
+uid: String
+}
+
+enum PolicyReviewStatus {
+GOOD
+POOR
+}
+
+enum PolicyApplicability {
+AUDITOR
+BOARD_MEMBER
+CUSTOMER
+STAFF
+}
+
+Mutation.saveOrUpdatePolicyRegistration(
+policyRegistrationDto: PolicyRegistrationDtoInput
+): Response_PolicyRegistration
+
+Query.allPolicyRegistrationsPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_PolicyRegistration
+
+Query.getPolicyRegistrationByUid(
+uid: String
+): Response_PolicyRegistration
+
+Query.myPolicyRegistrationsPageable(
+pageableParam: PageableParamInput
+): Page_PolicyRegistration

@@ -1,0 +1,83 @@
+type ClauseWithSpecificationDTOInput {
+active: Boolean
+agreementSectionUid: UUID!
+agreementUID: UUID!
+clauseNumber: String!
+clauseText: String!
+clauseTitle: String!
+clauseUid: UUID
+createdAt: LocalDateTime
+createdBy: String
+generatedClauseUid: UUID
+generatedSpecificationUid: UUID
+isMandatory: Boolean
+isNegotiable: Boolean
+legalReference: String!
+requiredData: String!
+specification: String!
+specificationUid: UUID
+subcategoryUid: UUID!
+updatedAt: LocalDateTime
+updatedBy: String
+}
+
+type ClauseWithSpecificationDTO {
+active: Boolean
+agreementSectionUid: UUID!
+agreementUID: UUID!
+clauseNumber: String!
+clauseText: String!
+clauseTitle: String!
+clauseUid: UUID
+createdAt: LocalDateTime
+createdBy: String
+generatedClauseUid: UUID
+generatedSpecificationUid: UUID
+isMandatory: Boolean
+isNegotiable: Boolean
+legalReference: String!
+requiredData: String!
+specification: String!
+specificationUid: UUID
+subcategoryUid: UUID!
+updatedAt: LocalDateTime
+updatedBy: String
+}
+
+Mutation.processClauseWithSpecification(
+clauseSpecsDTO: ClauseWithSpecificationDTOInput
+): Response_ClauseWithSpecificationDTO
+
+Mutation.createClauseWithSpecification(
+clauseSpecsDTO: ClauseWithSpecificationDTOInput
+): Response_ClauseWithSpecificationDTO
+
+Mutation.updateClauseWithSpecification(
+specificationUid: UUID
+clauseSpecsDTO: ClauseWithSpecificationDTOInput
+clauseUid: UUID
+): Response_ClauseWithSpecificationDTO
+
+Mutation.deleteClauseWithSpecification(
+specificationUid: UUID
+clauseUid: UUID
+): Response_Boolean
+
+Query.getClauseWithSpecificationByClauseUid(
+clauseUid: UUID
+): Response_ClauseWithSpecificationDTO
+
+Query.getClauseWithSpecification(
+specificationUid: UUID
+): Response_ClauseWithSpecificationDTO
+
+Query.existsClauseByNumber(
+clauseNumber: String
+): Response_Boolean
+
+Query.existsSpecificationForClauseAndSection(
+agreementSectionUid: UUID
+clauseUid: UUID
+): Response_Boolean
+
+

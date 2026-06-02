@@ -1,0 +1,61 @@
+type CaseRegistration {
+active: Boolean
+amount: Float
+createdAt: LocalDateTime
+createdBy: User
+dateOfSchedules: LocalDate
+decistion: String
+deletedAt: LocalDateTime
+deletedBy: Long
+id: Long
+isDeleted: Boolean
+migrated: Boolean
+name: String
+natureOfCase: CaseNature
+place: SubWard
+responsibleInstitution: String
+responsibleOfficer: User
+responsibleUnit: Department
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+year: Int
+}
+
+type CaseRegistrationDtoInput {
+amount: Float
+attachments: [AttachmentDtoInput]
+dateOfSchedules: LocalDate
+decision: String
+name: String
+natureOfCase: CaseNature
+placeUid: String
+responsibleDepartmentUid: String
+responsibleInstitution: String
+responsibleOfficerUid: String
+uid: String
+year: Int
+}
+
+enum CaseNature {
+CIVIL
+CRIMINAL
+}
+
+Mutation.saveOrUpdateCaseRegistration(
+caseRegistrationDto: CaseRegistrationDtoInput
+): Response_CaseRegistration
+
+Query.myCaseRegistrationsPageable(
+pageableParam: PageableParamInput
+): Page_CaseRegistration
+
+Query.allCaseRegistrationsPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_CaseRegistration
+
+Query.getCaseRegistrationByUid(
+uid: String
+): Response_CaseRegistration
+

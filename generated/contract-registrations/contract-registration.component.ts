@@ -7,12 +7,12 @@ import { FetchParameter } from "@shared/fetch/fetch.interface";
 import { ActionButton } from "@shared/components/action-buttons/action-buttons.inteface";
 import { ContentsViewComponent } from "@shared/components/view-component/contents-view/contents-view.component";
 
-import { Inquiry } from "./inquiry.interface";
-import { GET_INQUIRY_REPLIES } from "./inquiry.graphql";
-import { inquiryUpsertBtn, inquiry$ } from "./forms/inquiry.form";
+import { ContractRegistration } from "./contract-registration.interface";
+import { GET_CONTRACT_REGISTRATION_BY_UID } from "./contract-registration.graphql";
+import { contractRegistrationUpsertBtn, contractRegistration$ } from "./contract-registration.form";
 
 @Component({
-  selector: 'app-inquiry.',
+  selector: 'app-contract-registration.',
   imports: [CommonModule, PageHeaderComponent, ContentsViewComponent ],
   template: `
     <!--  -->
@@ -21,41 +21,41 @@ import { inquiryUpsertBtn, inquiry$ } from "./forms/inquiry.form";
         [title]="title"
         [subtitle]="subtitle"
         [actionButtons]="actionButtons"
-        [data]="inquiry"
+        [data]="contractRegistration"
       />
       <contents-view class="block grow" [contents]="contents" />
     </div>
    `
 })
-export class InquiryComponent extends BaseComponent implements OnInit {
-  override title = 'Inquiry';
-  override subtitle = 'Inquiry Management';
+export class ContractRegistrationComponent extends BaseComponent implements OnInit {
+  override title = 'Contract Registration';
+  override subtitle = 'Contract Registration Management';
 
-  inquiry: Inquiry | undefined;
+  contractRegistration: ContractRegistration | undefined;
   override contents: ContentParameter[] = [];
-  override actionButtons: ActionButton[] = [inquiryUpsertBtn(this)];
+  override actionButtons: ActionButton[] = [contractRegistrationUpsertBtn(this)];
 
   fetchParameter: FetchParameter = {
     loadingOn: 'no-content',
-    query: GET_INQUIRY_REPLIES,
+    query: GET_CONTRACT_REGISTRATION_BY_UID,
     successFn:(res) => this.title = res?.data?.name,
-    variables: { uid:this.route.snapshot?.paramMap?.get('inquiryUid')},
+    variables: { uid:this.route.snapshot?.paramMap?.get('contractRegistrationUid')},
   };
 
   async ngOnInit(): Promise<void> {
     await this.setContents();
-    this.subs.add(inquiry$.subscribe(() => this.setContents()));
+    this.subs.add(contractRegistration$.subscribe(() => this.setContents()));
   }
 
   async setContents() {
-    this.inquiry = await this.fs.fetch(this.fetchParameter);
+    this.contractRegistration = await this.fs.fetch(this.fetchParameter);
 
     this.contents = [
       {
         type: 'details',
         icon: 'notes',
         showUndefined: true,
-        entity: this.inquiry,
+        entity: this.contractRegistration,
         fetchParameter: this.fetchParameter,
       },
     ];

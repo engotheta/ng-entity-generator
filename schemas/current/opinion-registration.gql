@@ -1,0 +1,47 @@
+type OpinionRegistration {
+active: Boolean
+createdAt: LocalDateTime
+createdBy: User
+deletedAt: LocalDateTime
+deletedBy: Long
+findingStatus: String
+id: Long
+isDeleted: Boolean
+migrated: Boolean
+name: String
+nature: String
+resolutionStatus: String
+responsibleUnit: Department
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+valueObtained: String
+}
+
+type OpinionRegistrationDtoInput {
+attachments: [AttachmentDtoInput]
+findingStatus: String
+name: String
+nature: String
+resolutionStatus: String
+responsibleDepartmentUid: String
+uid: String
+valueObtained: String
+}
+
+Mutation.saveOrUpdateOpinionRegistration(
+opinionRegistrationDto: OpinionRegistrationDtoInput
+): Response_OpinionRegistration
+
+Query.myOpinionRegistrationsPageable(
+pageableParam: PageableParamInput
+): Page_OpinionRegistration
+
+Query.allOpinionRegistrationsPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_OpinionRegistration
+
+Query.getOpinionRegistrationByUid(
+uid: String
+): Response_OpinionRegistration

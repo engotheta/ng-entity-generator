@@ -1,0 +1,47 @@
+type LicenceRegistration {
+active: Boolean
+condition: String
+createdAt: LocalDateTime
+createdBy: User
+deletedAt: LocalDateTime
+deletedBy: Long
+department: Department
+duration: Int
+expirationDate: LocalDate
+id: Long
+isDeleted: Boolean
+migrated: Boolean
+name: String
+renewalRequirement: String
+uid: String
+updatedAt: LocalDateTime
+updatedBy: Long
+}
+
+type LicenceRegistrationDtoInput {
+attachments: [AttachmentDtoInput]
+condition: String
+departmentUid: Long
+duration: Int
+expirationDate: LocalDate
+name: String
+renewalRequirement: String
+uid: String
+}
+
+Mutation.saveOrUpdateLicenceRegistration(
+licenceRegistrationDto: LicenceRegistrationDtoInput
+): Response_LicenceRegistration
+
+Query.allLicenceRegistrationsPageable(
+pageableParam: PageableParamInput
+active: Boolean
+): Page_LicenceRegistration
+
+Query.myLicenceRegistrationsPageable(
+pageableParam: PageableParamInput
+): Page_LicenceRegistration
+
+Query.getLicenceRegistrationByUid(
+uid: String
+): Response_LicenceRegistration
